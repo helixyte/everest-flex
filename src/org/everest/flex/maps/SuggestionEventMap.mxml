@@ -24,12 +24,11 @@ triggered by auto 'sugest' components such as a combo box.
             import mx.events.FlexEvent;
 
 
-
             [Bindable]
             public var memberAttribute:String = "selfLink";
 
             [Bindable]
-            private var manager:Class = SuggestionManager;
+            public var manager:Class = SuggestionManager;
 
             [Bindable]
             public var presenter:Class;

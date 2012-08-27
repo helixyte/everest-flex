@@ -61,7 +61,7 @@ package org.everest.flex.model.managers
 
         }
 
-        private function loadMember(entry:XML):Object{
+        protected function loadMember(entry:XML):Object{
             use namespace atom;
 
             var result:Object = new Object();
