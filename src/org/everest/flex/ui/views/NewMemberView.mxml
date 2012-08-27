@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+This is a template that can be used to create the user interface for creating
+new members to be added to a collection.</br>
+The custom NewMemberViews can be directly injected into the collection view. Then
+a button will be shown that opens this window to allow the user to add new members
+to the specific collection view.
+@see org.everest.flex.ui.views.CollectionView
+-->
+<components:ResizableTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:validators="org.everest.flex.ui.validators.*"
+                 close="close();"
+                 minWidth="400" xmlns:components="org.everest.flex.ui.components.*">
+
+
+    <components:layout>
+        <s:VerticalLayout paddingTop="5" paddingBottom="5" paddingRight="5" paddingLeft="5"/>
+    </components:layout>
+
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.model.Member;
+            import org.everest.flex.ui.validators.FormValidator;
+            import org.everest.flex.ui.presenters.CollectionPresentationModel;
+
+            import mx.managers.PopUpManager;
+
+
+            [Bindable]
+            public var model:CollectionPresentationModel;
+
+            // Handle the close button and Cancel button.
+            public function close():void {
+                PopUpManager.removePopUp(this);
+            }
+
+            protected function get member():Member{
+                return null; //needs to be overwritten by the implementation
+            }
+
+            protected function createMember(e:Event=null):void{
+                if(formValidator.formIsValid){
+                    var m:Member =  member;
+
+                    if(m != null){
+                        model.createMember(m);
+//                        close();
+                    }
+                }
+            }
+
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <fx:Array id="validators"/>
+        <validators:FormValidator id="formValidator" validators="{validators}" />
+    </fx:Declarations>
+</components:ResizableTitleWindow>

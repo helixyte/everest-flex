@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\DataGridLinkRenderer.mxml -->
+<!---
+General Spark ItemRenderer that makes the INavigationLink contents clickable.
+-->
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:mx="library://ns.adobe.com/flex/mx"
+                autoDrawBackground="true">
+    <s:layout>
+        <s:VerticalLayout />
+    </s:layout>
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.NavigationLinkEvent;
+            import org.everest.flex.model.Link;
+
+            protected function navigateToLink(event:MouseEvent):void
+            {
+                if (data.url != null) {
+                    var evt:NavigationLinkEvent = new NavigationLinkEvent(NavigationLinkEvent.GOTO_LINK);
+                    evt.link = Link(data);
+                    dispatchEvent(evt);
+                }
+            }
+        ]]>
+    </fx:Script>
+
+    <mx:LinkButton id="linkBtn" label="{data.title}" paddingLeft="1"
+                   textDecoration="underline"
+                   click="navigateToLink(event)" />
+</s:ItemRenderer>

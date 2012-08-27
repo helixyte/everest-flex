@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\DrowDownLink.mxml -->
+<!---
+Similar to a combo box this is a simple underlined text (style of a 'link') that
+opens up a dropw down box with coices upon user click.
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         mouseOver="{dropDownList.visible=true}"
+         mouseOut="labelButton_mouseOutHandler(event)"
+         >
+    <fx:Metadata>
+        [Event(name="change", type="spark.events.IndexChangeEvent")]
+    </fx:Metadata>
+
+    <fx:Script>
+        <![CDATA[
+            import spark.events.IndexChangeEvent;
+
+            private var _selectedItem:Object;
+
+            protected function dropDownList_changeHandler(event:IndexChangeEvent):void
+            {
+                selectedItem = dropDownList.selectedItem;
+                dispatchEvent(event);
+            }
+
+            protected function labelButton_mouseOutHandler(event:MouseEvent):void
+            {
+                if (!dropDownList.isDropDownOpen)
+                {
+                    dropDownList.visible=false;
+                }
+            }
+
+            [Bindable]
+            public function get selectedItem():Object
+            {
+                if ((_selectedItem == null)&&(dataProvider != null))
+                {
+                    _selectedItem = dataProvider.getItemAt(1);
+                }
+                return _selectedItem;
+            }
+
+            public function set selectedItem(value:Object):void
+            {
+                _selectedItem = value;
+            }
+
+
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <s:ArrayCollection id="dataProvider"/>
+    </fx:Declarations>
+
+    <s:Button label="{selectedItem.label}"
+              id="labelButton"
+              visible="{!dropDownList.visible}"
+              focusIn="{dropDownList.visible=true}"
+              skinClass="org.everest.flex.ui.skins.LinkButtonSkin"
+              left="6"
+              top="6"
+              width="65"/>
+
+    <s:DropDownList id="dropDownList"
+                    width="65"
+                    visible="false"
+                    focusOut="{dropDownList.visible=false}"
+                    dataProvider="{dataProvider}"
+                    selectedItem="{selectedItem}"
+                    close="dropDownList.visible=false"
+                    change="dropDownList_changeHandler(event)"/>
+</s:Group>

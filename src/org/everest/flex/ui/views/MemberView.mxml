@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+This is a component that all member views of an everest flex application inherit
+from.<br/>
+The main content will go into the content section.<br/>
+If components are set to the editableContent section an edit button will<br/>
+be shown. The edit view will be loaded and the save button will trigger
+a <code>model.submit</code> action.<br/>
+The additionalContent section goes below and it not intended to be editable.
+-->
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:validators="org.everest.flex.ui.validators.*"
+         initialize="init();"
+         currentState="{model.viewState}"
+         verticalAlign="top"
+         enabled.pendingResponse="false" xmlns:BarCode="BarCode.*" >
+
+
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.model.ResourceState;
+            import org.everest.flex.ui.presenters.MemberPresentationModel;
+
+            import mx.controls.dataGridClasses.DataGridColumn;
+            import mx.core.UIComponent;
+            import mx.managers.BrowserManager;
+
+            import spark.components.gridClasses.GridColumn;
+            import spark.formatters.DateTimeFormatter;
+
+            [ArrayElementType("mx.core.UIComponent")]
+            public var content:Array;
+
+            [ArrayElementType("mx.core.UIComponent")]
+            public var editorContent:Array;
+
+            [ArrayElementType("mx.core.UIComponent")]
+            public var additionalContent:Array;
+
+            [Bindable]
+            [ArrayElementType("mx.core.UIComponent")]
+            public var actionBarContent:Array;
+
+            [Bindable]
+            public var title:String;
+
+            [Bindable]
+            public var model:*;
+
+            [Bindable]
+            public var editable:Boolean = false;
+
+            private static const DATE_TIME_FORMAT:DateTimeFormatter = new DateTimeFormatter();
+            DATE_TIME_FORMAT.dateTimePattern = "EEE, MMM dd yyyy HH:mm";
+
+            private function init():void {
+                // Add the top component to the VBox container.
+                if (content != null)
+                {
+                    for each (var e:UIComponent in content)
+                    {
+                        contentGroup.addElement(e);
+                    }
+                }
+                if (editorContent != null)
+                {
+                    for each (var e1:UIComponent in editorContent)
+                    {
+                        contentGroupEditable.addElement(e1);
+                    }
+                    editable = true;
+                }
+                //this is additional content that goes below the editable member form
+                if (additionalContent != null)
+                {
+                    additionalContentGroup.percentHeight = 100;
+                    for each (var f:UIComponent in additionalContent)
+                    {
+                        additionalContentGroup.addElement(f);
+                    }
+                }
+                //this is additional content that goes below the editable member form
+                if (actionBarContent != null)
+                {
+                    actionBarContentGroup.includeInLayout = true;
+                    for each (var g:UIComponent in actionBarContent)
+                    {
+                        actionBarContentGroup.addElement(g);
+                    }
+                }
+
+            }
+
+            protected function reset(model:MemberPresentationModel):void
+            {
+                currentState = ResourceState.VIEW;
+                model.resetPage();
+            }
+
+
+            protected function edit(event:MouseEvent):void
+            {
+                currentState = ResourceState.EDIT;
+            }
+
+
+            public function submit(model:MemberPresentationModel):void{
+                formValidator.validateForm(null);
+                if(formValidator.formIsValid){
+                        currentState = ResourceState.PENDING_REQUEST;
+                        model.submit();
+                }
+            }
+
+            protected function dateFormatLabelFunction(
+                item:Object, column:*):String
+            {
+                var value:* = item[column.dataField];
+                if (value != null)
+                {
+                    var result:Date = value as Date;
+                    return result.toLocaleString();
+                } else {
+                    return "";
+                }
+
+            }
+
+            public function dateToString(date:Date):String
+            {
+                if (date == null)
+                {
+                    return "";
+
+                } else {
+                    return DATE_TIME_FORMAT.format(date);
+                }
+            }
+
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <fx:Array id="validators"/>
+        <validators:FormValidator id="formValidator" validators="{validators}" />
+    </fx:Declarations>
+    <s:states>
+        <s:State name="pendingRequest" />
+        <s:State name="pendingResponse" />
+        <s:State name="edit" />
+        <s:State name="view" />
+    </s:states>
+
+    <s:Label id="labelElement" text="{title}" fontWeight="bold" fontSize="14" paddingTop="5" />
+
+    <s:Group width="100%">
+        <s:Rect width="100%" height="100%">
+            <s:fill><s:SolidColor color="0xFFFFFF" /></s:fill>
+        </s:Rect>
+
+        <s:VGroup id="contentGroup" width="100%" excludeFrom="edit" itemCreationPolicy="immediate"
+                  paddingRight="5"
+                  paddingLeft="5"
+                  paddingBottom="5"/>
+
+        <s:VGroup id="contentGroupEditable" width="100%" includeIn="edit"
+                  itemCreationPolicy="immediate"
+                  paddingRight="5"
+                  paddingLeft="5"
+                  paddingBottom="5"/>
+    </s:Group>
+    <s:Group visible="{editable || actionBarContent != null}">
+        <s:Rect top="-10"
+                bottom="0"
+                right="0"
+                left="0"
+                bottomLeftRadiusY="2"
+                bottomRightRadiusY="2"
+                bottomLeftRadiusX="2"
+                bottomRightRadiusX="2">
+            <s:fill>
+                <s:SolidColor color="#FFFFFF" />
+            </s:fill>
+        </s:Rect>
+        <s:HGroup id="actionBar" top="-5" bottom="5" left="5" right="5">
+            <s:Button id="editMember" label="Edit" 	   click="edit(event)" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>
+            <!--<s:Button id="deleteMember" label="Delete" click="model.deleteMember()" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>-->
+            <s:Button id="saveMember" label="Save"     click="{submit(model)}" includeIn="edit" chromeColor="#ccFFcc"/>
+            <s:Button id="resetMember" label="Reset"   click="{reset(model)}" includeIn="edit" />
+            <s:HGroup id="actionBarContentGroup" includeInLayout="false" excludeFrom="edit" itemCreationPolicy="immediate"/>
+        </s:HGroup>
+    </s:Group>
+
+    <s:VGroup id="additionalContentGroup" width="100%" paddingTop="5">
+
+    </s:VGroup>
+</s:VGroup>

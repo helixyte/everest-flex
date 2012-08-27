@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+This is a configruable component that all everest collection views can simply
+extend.
+<ul>
+<li>In the top it contains an optional filter form. (configurable filterFormContent components)</li>
+<li>In the center adatagrid with the collection items. (configurabel columns through method: collectionGridColumns())</li>
+<li>In the bottom left buttons to create or delete items are shown.</li>
+<li>In the bottom on the right custom components can be added. (configurable footerContent components)</li>
+</ul>
+@see org.everest.flex.ui.presenters.CollectionPresentationModel
+@see org.everest.flex.maps.CollectionEventMap
+-->
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+          xmlns:s="library://ns.adobe.com/flex/spark"
+
+          xmlns:mx="library://ns.adobe.com/flex/mx"
+          xmlns:components="org.everest.flex.ui.components.*"
+          width="100%" height="100%"
+          initialize="init();"
+          currentState="{model.viewState}"
+          creationComplete="creationCompleteHandler(event)" >
+
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="pendingRequest" />
+        <s:State name="pendingResponse" />
+        <s:State name="foldedFilterForm" />
+    </s:states>
+
+    <fx:Script>
+        <![CDATA[
+            import mx.collections.ArrayCollection;
+            import mx.core.IFlexDisplayObject;
+            import mx.core.UIComponent;
+            import mx.events.FlexEvent;
+            import mx.managers.PopUpManager;
+
+            import org.everest.flex.ui.components.MemberDataGrid;
+            import org.everest.flex.ui.presenters.CollectionPresentationModel;
+            import org.everest.flex.ui.renderers.MultiColSortableGridHeaderRenderer;
+
+            import spark.components.gridClasses.GridColumn;
+            import spark.formatters.DateTimeFormatter;
+            import spark.layouts.FormLayout;
+            import spark.layouts.HorizontalLayout;
+
+//			[ArrayElementType("mx.core.UIComponent")]
+//			public var filterForm:Array;
+            private var _collectionGridColumns:Array;
+
+            [ArrayElementType("mx.core.UIComponent")]
+            public var footerContent:Array;
+
+            [ArrayElementType("mx.core.UIComponent")]
+            public var filterFormContent:Array;
+
+            [Bindable]
+            /**
+             * Title to be shown in the top of the screen.
+             **/
+            public var title:String;
+
+            [Bindable]
+            /**
+             * If the collection view should allow the user to add new members
+             * than this view for creating it is needed.
+             * To ease the task a it should extend the NewMemberView.
+             * @see org.everest.flex.ui.views.NewMemberView
+             **/
+            public var newMemberView:Class = null;
+
+            [Bindable]
+            /**
+             * If set to true a button in the bottom will allow to download the
+             * collection as CSV.
+             **/
+            public var showCsvButton:Boolean = false;
+
+            [Bindable]
+            /**
+             * The presentation model.
+             * @see org.everest.flex.ui.presenters.CollectionPresentationModel
+             **/
+            public var model:CollectionPresentationModel;
+
+            private static const DATE_FORMAT:DateTimeFormatter = new DateTimeFormatter();
+                                 DATE_FORMAT.dateTimePattern = "EEE, MMM dd yyyy";
+
+            private static const DATE_TIME_FORMAT:DateTimeFormatter = new DateTimeFormatter();
+                                 DATE_TIME_FORMAT.dateTimePattern = "EEE, MMM dd yyyy HH:mm";
+
+            private var customHeaderRenderer:ClassFactory = new ClassFactory(MultiColSortableGridHeaderRenderer);
+
+            private function init():void {
+                // Add the filter form elements to the vertical layout.
+                if (filterFormContent != null)
+                {
+                    var i:int = 0;
+                    for each (var e:UIComponent in filterFormContent)
+                    {
+                        filterForm.addElement(e);
+                        i++;
+                    }
+
+                    //set the layout depending on the number of Elements
+                    if (i > 3)
+                    {
+                        var l:FormLayout = new FormLayout();
+                            l.gap = -6;
+                        filterForm.layout = l;
+                    } else {
+                        filterForm.layout = new HorizontalLayout();
+                    }
+
+                } else {
+                    //otherwise hide the form and buttons
+                    formActions.visible = false;
+                    formActions.includeInLayout = false;
+                    filterFormContainer.visible = false;
+                    filterFormContainer.includeInLayout = false;
+                }
+
+                //this is additional content that goes into the footer on the right
+                if (footerContent != null)
+                {
+                    footerContentGroup.includeInLayout = true;
+                    for each (var g:UIComponent in footerContent)
+                    {
+                        footerContentGroup.addElement(g);
+                    }
+                }
+
+            }
+
+            /**
+             * Define the columns for the datagrid.
+             *
+             * @param collectionGridColumns
+             */
+            public function set collectionGridColumns(collectionGridColumns:Array):void
+            {
+                if (collectionGridColumns != null)
+                {
+                    for each (var column:GridColumn in collectionGridColumns)
+                    {
+                        column.headerRenderer = customHeaderRenderer;
+                    }
+
+                    this._collectionGridColumns = collectionGridColumns;
+                    resultGrid.columns = new ArrayCollection(_collectionGridColumns);
+                }
+            }
+
+            /**
+             * Datagrid label function to format a datestamp as readable date and time
+             * @see #DATE_TIME_FORMAT
+             *
+             * @param item the item of the current row
+             * @param column the column that contains the date information
+             */
+            public static function dateTimeLabelFunction(item:Object, column:*):String
+            {
+                var value:* = item[column.dataField];
+                if (value != null)
+                {
+                    return DATE_TIME_FORMAT.format(value);
+                } else {
+                    return "";
+                }
+            }
+
+            /**
+             * Datagrid label function to format a datestamp as readable date
+             * @see #DATE_FORMAT
+             *
+             * @param item the item of the current row
+             * @param column the column that contains the date information
+             */
+            protected function dateLabelFunction(item:Object, column:*):String
+            {
+                var value:* = item[column.dataField];
+                if (value != null)
+                {
+                    return DATE_FORMAT.format(value);
+                } else {
+                    return "";
+                }
+
+            }
+
+            protected function showCreateMemberView(view:Class):void{
+
+                var  p:IFlexDisplayObject = PopUpManager.createPopUp(this, view, true);
+                     NewMemberView(p).model = this.model;
+                    PopUpManager.centerPopUp(p);
+                this.addEventListener(Event.REMOVED_FROM_STAGE, function(evnent:Event):void{PopUpManager.removePopUp(p)});
+            }
+
+
+            protected function foldUnfoldButton_clickHandler(event:MouseEvent):void
+            {
+                currentState = (currentState != "foldedFilterForm") ? "foldedFilterForm" :  "normal";
+            }
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                if (_collectionGridColumns != null)
+                {
+                    resultGrid.columns = new ArrayCollection(_collectionGridColumns);
+                }
+            }
+
+            protected function filterButton_clickHandler(event:MouseEvent):void
+            {
+                model.filterCollection()
+            }
+
+        ]]>
+    </fx:Script>
+    <s:transitions>
+        <mx:Transition fromState="*" toState="foldedFilterForm">
+            <s:Animate target="{filterFormContainer}" duration="80">
+                <s:SimpleMotionPath property="height" />
+            </s:Animate>
+        </mx:Transition>
+        <mx:Transition fromState="foldedFilterForm" toState="*">
+            <s:Animate target="{filterFormContainer}" duration="140" >
+                <s:SimpleMotionPath property="height" />
+            </s:Animate>
+        </mx:Transition>
+    </s:transitions>
+
+    <s:Label id="labelElement" text="{title}" fontWeight="bold" fontSize="14" paddingTop="4"  />
+    <s:Group width="100%" id="filterFormContainer" >
+        <s:Rect top="0" bottom="0" right="0" left="0"
+                radiusX="3" radiusY="3">
+            <s:fill>
+                <s:SolidColor color="#FFFFFF" />
+            </s:fill>
+        </s:Rect>
+        <s:Form id="filterForm" left="3" top="0" bottom="0" right="3"
+                excludeFrom="foldedFilterForm" itemCreationPolicy="immediate"/>
+        <components:ImageButton source="@Embed('../assets/fold_unfold.png')"
+                                click="foldUnfoldButton_clickHandler(event)"
+                                bottom="1" left="{width/2}" toolTip="show or hide filter options"/>
+    </s:Group>
+    <s:VGroup width="100%" height="100%" gap="-1">
+        <s:HGroup width="100%">
+
+            <components:Pager id="pager"
+                              model="{model}"
+                              title="{title}"
+                              width="100%" />
+
+            <s:Group id="formActions" width="210"
+                     excludeFrom="foldedFilterForm" itemCreationPolicy="immediate">
+                <s:Rect top="-15" bottom="0" right="0" left="0"
+                        bottomLeftRadiusY="3"
+                        bottomRightRadiusY="3"
+                        bottomLeftRadiusX="3"
+                        bottomRightRadiusX="3">
+                    <s:fill>
+                        <s:SolidColor color="#FFFFFF" />
+                    </s:fill>
+                </s:Rect>
+                <s:Button id="resetButton" label="Reset"
+                          click="model.resetPage()"
+                          enabled.pendingResponse="false"
+                          width="100" left="3" top="-3" bottom="3"/>
+                <s:Button id="filterButton" label="{model.filterButtonLabel}"
+                          click="filterButton_clickHandler(event)"
+                          enabled.pendingResponse="false"
+                          fontWeight="bold"
+                          width="100" right="3" top="-3" bottom="3"/>
+            </s:Group>
+
+        </s:HGroup>
+
+        <components:MemberDataGrid id="resultGrid"
+                                   selectionMode="multipleRows"
+                                   model="{model}"
+                                   borderColor="#999999" contentBackgroundColor="#FFFFFF">
+        </components:MemberDataGrid>
+
+    </s:VGroup>
+
+
+    <s:HGroup verticalAlign="middle" width="100%">
+        <s:Button id="viewMember" label="View"
+                  click="model.navigateToMember(resultGrid.selectedItem)"
+                  enabled="{resultGrid.selectedItem != null}"/>
+        <s:Button id="createMember" label="Create"
+                  click="{showCreateMemberView(newMemberView)}"
+                  enabled="{newMemberView != null}"/>
+        <s:Button id="deleteMember" label="Delete"
+                  click="model.deleteSelected()"
+                  enabled="{resultGrid.selectedItem != null}"
+                  visible="false"
+                  includeInLayout="false"/>
+        <s:Button id="csv" label="CSV"
+                  click="model.downloadCSV()"
+                  visible="{showCsvButton}" includeInLayout="{showCsvButton}"/>
+        <s:Button id="print" label="Print" click="{resultGrid.printSelectedRows()}" enabled="{resultGrid.selectedItem != null}" />
+        <s:Spacer width="100%"/>
+        <s:HGroup id="footerContentGroup" includeInLayout="false" verticalAlign="middle"/>
+    </s:HGroup>
+
+</s:VGroup>

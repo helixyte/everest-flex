@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\SuggestionDropDownListView.mxml -->
+<!---
+This is a complete independent view that its own presenter and data model.
+The view loads a collection from the configured url and uses it to provide an
+auto complete drop-down box.
+It can be used as part of a form to filter a collection or to edit/create a new
+member.
+-->
+<components:FilterComboBox xmlns:fx="http://ns.adobe.com/mxml/2009"
+                           xmlns:s="library://ns.adobe.com/flex/spark"
+                           xmlns:mx="library://ns.adobe.com/flex/mx"
+                           xmlns:components="org.everest.flex.ui.components.*"
+                           change="changeHandler(event)" initialize="loadFeed()"
+                           skinClass="org.everest.flex.ui.skins.ComboBoxSkin">
+    <fx:Script>
+        <![CDATA[
+            import mx.binding.utils.BindingUtils;
+            import mx.collections.IList;
+
+            import org.everest.flex.events.SuggestionEvent;
+            import org.everest.flex.interfaces.INavigationLink;
+            import org.everest.flex.model.Link;
+            import org.everest.flex.model.SelectionChoice;
+            import org.everest.flex.query.Criteria;
+            import org.everest.flex.query.Criterion;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            import spark.events.IndexChangeEvent;
+
+            public var _criteria:Criteria;
+            public var operator:String;
+
+            [Bindable]
+            public var defaultChoice:Boolean=true;
+
+            [Bindable]
+            public var preselectedValue:*;
+
+            [Bindable]
+            private var _url:String;
+
+            [Bindable]
+            private var _model:SuggestionDropDownListPresentationModel;
+
+            public function get url():String
+            {
+                return _url;
+            }
+
+            public function set url(value:String):void
+            {
+                if (_url != value)
+                {
+                    _url=value;
+                    loadFeed();
+                }
+            }
+
+            public function get model():SuggestionDropDownListPresentationModel
+            {
+                return _model;
+            }
+
+            public function set model(model:SuggestionDropDownListPresentationModel):void
+            {
+                if (model)
+                {
+                    _model=model;
+                    BindingUtils.bindProperty(this, "dataProvider", model, "suggestion");
+                }
+                this.enabled=true;
+            }
+
+            override public function set dataProvider(list:IList):void
+            {
+                this.enabled=true;
+                if((list == null)||(list.length<1))
+                {
+                    return;
+                }
+
+                if (defaultChoice)
+                {
+                    if (list.getItemAt(0).label != "All")
+                    {
+                        var choice:SelectionChoice=new SelectionChoice("All", null);
+                        list.addItemAt(choice, 0);
+                        selectedItem=choice;
+                    }
+                }
+
+                super.dataProvider=list;
+                //selectedItem = dataProvider.getItemAt(0);
+
+                if (_criteria != null)
+                {
+                    var criterion:Criterion=_criteria.get(name, operator);
+
+                    if (criterion != null)
+                    {
+                        //select the item if it is set through a search term.
+                        var i:int=0;
+
+                        for each (var entry:Object in model.suggestion)
+                        {
+                            if (entry.value == criterion.value[0])
+                            {
+                                selectedItem=entry;
+                                break;
+                            }
+                            i++;
+                        }
+                    }
+                }
+                else if (preselectedValue)
+                {
+                    for each (var e:SelectionChoice in list)
+                    {
+                        if (e.value == preselectedValue)
+                        {
+                            selectedItem = e;
+                        }
+                    }
+
+                }
+                this.enabled=true;
+            }
+
+
+            protected function loadFeed():void
+            {
+                var evt:SuggestionEvent;
+                if (_url != null)
+                {
+                    this.enabled=false;
+                    evt=new SuggestionEvent(SuggestionEvent.LOAD_DATA);
+                    evt.url=_url;
+                    dispatchEvent(evt);
+                }
+            }
+
+
+
+            public function set criteria(crit:Criteria):void
+            {
+
+                this._criteria=crit;
+
+                if (_criteria != null)
+                {
+                    var criterion:Criterion=_criteria.get(name, operator);
+
+                    if (criterion != null)
+                    {
+                        //select the item if it is set through a search term.
+                        var i:int=0;
+                        for each (var entry:Object in _model.suggestion)
+                        {
+                            if (entry.value == criterion.value[0])
+                            {
+                                this.selectedIndex=i;
+                                break;
+                            }
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        //we need to reset things
+                        reset();
+                    }
+
+                }
+            }
+
+            [Bindable]
+            public function get criteria():Criteria
+            {
+
+                return this._criteria;
+            }
+
+
+            protected function changeHandler(event:IndexChangeEvent):void
+            {
+                if ((_criteria != null) && (this.selectedItem != null))
+                {
+                    if (this.selectedItem.value != null)
+                    {
+                        _criteria.put(new Criterion(name, operator, [this.selectedItem.value]));
+                    }
+                    else
+                    {
+                        _criteria.remove(name, operator);
+                    }
+                }
+            }
+
+            public function get selectedItemAsLink():INavigationLink
+            {
+                if (selectedItem != null)
+                {
+                    return new Link(selectedItem.label, selectedItem.value);
+                }
+
+                return null;
+            }
+        ]]>
+    </fx:Script>
+</components:FilterComboBox>

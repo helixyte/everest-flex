@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\Pager.mxml -->
+<!---
+User interface controls that are associated to a collection view. It contains
+the controls to switch pages and to define the page size.
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx" width="100%"
+         currentState="{model.viewState}"
+         xmlns:components="org.everest.flex.ui.components.*">
+
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.ui.presenters.CollectionPresentationModel;
+
+            [Bindable]
+            public var model:CollectionPresentationModel;
+
+            [Bindable]
+            public var title:String = "Records";
+        ]]>
+    </fx:Script>
+
+    <s:states>
+        <!-- ResourceState.PENDING_REQUEST -->
+        <s:State name="pendingRequest"/>
+        <!-- ResourceState.PENDING_RESPONSE -->
+        <s:State name="pendingResponse"/>
+    </s:states>
+
+    <s:Rect top="0"
+            right="0"
+            left="0"
+            height="23"
+            topLeftRadiusY="3"
+            topRightRadiusY="3"
+            topLeftRadiusX="3"
+            topRightRadiusX="3">
+        <s:stroke>
+            <s:SolidColorStroke color="#CCCCCC" weight="1" />
+        </s:stroke>
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xF9F9F9"/>
+                <s:GradientEntry color="0xEFEFEF"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:HGroup verticalAlign="middle"
+              width="100%" paddingTop="2" height="23" paddingLeft="4">
+
+        <s:Spacer width="100%"/>
+
+        <components:ImageButton id="firstPageLink" enabled="{model.hasFirstPage}"
+                                click="model.presentFirstPage()" toolTip="first page"
+                                source="@Embed('/org/everest/flex/ui/assets/firstpage.png')"
+                                enabled.pendingResponse="false"/>
+
+        <components:ImageButton id="previousPageLink" enabled="{model.hasPreviousPage}"
+                                click="model.presentPreviousPage()"
+                                toolTip="previous page"
+                                source="@Embed('/org/everest/flex/ui/assets/previouspage.png')"
+                                enabled.pendingResponse="false"/>
+
+        <s:Spacer width="30"/>
+
+        <s:Label text="{model.startNumber} to {model.endNumber} of {model.totalResults} - Items per Page:"
+                 height="22"
+                 verticalAlign="middle"/>
+
+        <components:DropDownLink
+                    id="pageSize"
+                    dataProvider="{model.pageSizes}"
+                    selectedItem="{model.selectedPageSize}"
+                    enabled.pendingResponse="false"
+                    change="{model.changePageSize(pageSize.selectedItem)}"/>
+
+        <components:ImageButton id="nextPageLink" enabled="{model.hasNextPage}"
+                                click="model.presentNextPage()" toolTip="next page"
+                                source="@Embed('/org/everest/flex/ui/assets/nextpage.png')"
+                                enabled.pendingResponse="false"/>
+
+        <components:ImageButton id="lastPageLink" enabled="{model.hasLastPage}"
+                                click="model.presentLastPage()" toolTip="last page"
+                                source="@Embed('/org/everest/flex/ui/assets/lastpage.png')"
+                                enabled.pendingResponse="false"/>
+
+        <s:Spacer width="70%"/>
+
+        <s:Label text="Elapsed Seconds:" color="#999999" visible="{Number(model.totalRequestTime) > 0}"/>
+
+        <s:Label text="{model.totalRequestTime}" color="#999999" visible="{Number(model.totalRequestTime) > 0}"/>
+
+        <s:Spacer width="5"/>
+    </s:HGroup>
+
+</s:Group>

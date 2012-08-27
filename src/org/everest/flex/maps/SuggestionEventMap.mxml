@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\SuggestionEventMap.mxml -->
+<!---
+Mate framework event handler definition for suggestion events. These are
+triggered by auto 'sugest' components such as a combo box.
+
+@see http://mate.asfusion.com/page/documentation/tags/eventmap
+-->
+<LocalEventMap xmlns="http://mate.asfusion.com/"
+               xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               cache="local" xmlns:utils="org.everest.flex.utils.*"
+               >
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.events.SuggestionEvent;
+            import org.everest.flex.model.managers.CollectionManager;
+            import org.everest.flex.model.managers.SuggestionManager;
+
+            import org.everest.flex.utils.TraceUtils;
+
+            import mx.events.FlexEvent;
+
+
+
+            [Bindable]
+            public var memberAttribute:String = "selfLink";
+
+            [Bindable]
+            private var manager:Class = SuggestionManager;
+
+            [Bindable]
+            public var presenter:Class;
+
+            [Bindable]
+            public var view:Class;
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- Events -->
+        <EventHandlers type="{FlexEvent.CREATION_COMPLETE}"
+                       start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE', dispatcher)"
+                       end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE', dispatcher)">
+        </EventHandlers>
+
+        <EventHandlers type="{SuggestionEvent.LOAD_DATA}"
+                       start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'SuggestionEvent.LOAD_DATA', dispatcher)"
+                       end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'SuggestionEvent.LOAD_DATA', dispatcher)">
+            <utils:RestServiceInvoker url="{event.url}" resultFormat="e4x"
+                                method="GET">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{manager}" method="loadData"
+                        arguments="{[resultObject]}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Property targetKey="content" source="fault"
+                                  sourceKey="content"/>
+                        <Property targetKey="faultCode" source="fault"
+                                  sourceKey="faultCode"/>
+                        <Property targetKey="faultDetail" source="fault"
+                                  sourceKey="faultDetail"/>
+                        <Property targetKey="faultString" source="fault"
+                                  sourceKey="faultString"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{view}"
+                   start="TraceUtils.traceMessage(TraceUtils.START_INJECTOR_MSG, view, dispatcher)"
+                   end="TraceUtils.traceMessage(TraceUtils.END_INJECTOR_MSG, view, dispatcher)">
+            <ObjectBuilder generator="{manager}" cache="local" />
+            <ObjectBuilder generator="{presenter}"
+                           constructorArguments="{[scope.dispatcher, memberAttribute]}" />
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{presenter}"
+                   start="TraceUtils.traceMessage(TraceUtils.START_INJECTOR_MSG, presenter, dispatcher)"
+                   end="TraceUtils.traceMessage(TraceUtils.END_INJECTOR_MSG, presenter, dispatcher)">
+            <PropertyInjector targetKey="members"
+                              source="{manager}"
+                              sourceKey="members" />
+            <PropertyInjector targetKey="member"
+                              source="{manager}"
+                              sourceKey="member" />
+        </Injectors>
+    </fx:Declarations>
+</LocalEventMap>

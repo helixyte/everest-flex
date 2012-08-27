@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\MemberLinkButton.mxml -->
+<!---
+A simple button that wraps around a INavigationLink object. When it is clicked
+the link will be loaded by the everest flex framework.
+-->
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               skinClass="org.everest.flex.ui.skins.LinkButtonSkin"
+               click="linkClickHandler()">
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.NavigationEvent;
+            import org.everest.flex.interfaces.INavigationLink;
+            import org.everest.flex.ui.presenters.MemberPresentationModel;
+
+            import mx.events.FlexEvent;
+
+            [Bindable]
+            private var _link:INavigationLink;
+
+            public function get link():INavigationLink
+            {
+                return _link;
+            }
+
+            public function set link(value:INavigationLink):void
+            {
+                _link = value;
+                label = _link.title;
+            }
+
+            protected function linkClickHandler():void
+            {
+                if (_link.href != null) {
+                    trace("- Goto Link: " + _link.href);
+                    var event:NavigationEvent = new NavigationEvent(NavigationEvent.LOAD_PAGE);
+                    event.pageUrl = _link.href;
+                    dispatchEvent(event);
+                }
+            }
+
+        ]]>
+    </fx:Script>
+</s:Button>

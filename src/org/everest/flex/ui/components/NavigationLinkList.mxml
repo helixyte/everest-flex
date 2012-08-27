@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\NavigationLinkList.mxml -->
+<!---
+A spark list that displays a set of INavigationLink object. When an item is
+clicked the link will be loaded by the everest flex framework.
+-->
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx" width="256" height="256"
+        itemRenderer="org.everest.flex.ui.renderers.NavigationLinkRenderer"
+        creationComplete="creationCompleteHandler(event)">
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.NavigationLinkEvent;
+            import org.everest.flex.ui.presenters.MemberPresentationModel;
+            import org.everest.flex.ui.renderers.NavigationLinkRenderer;
+
+            import mx.binding.utils.BindingUtils;
+            import mx.events.FlexEvent;
+
+            [Bindable]
+            public var modelAttribute:String;
+
+            [Bindable]
+            private var _model:MemberPresentationModel;
+
+            public function get model():MemberPresentationModel
+            {
+                return _model;
+            }
+
+            public function set model(value:MemberPresentationModel):void
+            {
+                _model = value;
+                BindingUtils.bindProperty(
+                    this, "dataProvider", model, modelAttribute
+                );
+            }
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                addEventListener(NavigationLinkEvent.GOTO_LINK,
+                    navigateToLinkHandler);
+            }
+
+            protected function navigateToLinkHandler(event:NavigationLinkEvent):void
+            {
+                model.navigateToLink(event.link.href);
+            }
+        ]]>
+    </fx:Script>
+</s:List>

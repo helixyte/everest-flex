@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\PrintPreView.mxml -->
+<!---
+A simple ui component to be use to do a print preview for a collection.
+-->
+<components:ResizableTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                 xmlns:s="library://ns.adobe.com/flex/spark"
+                                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                                 minWidth="600"
+                                 minHeight="500"
+                                 width="900"
+                                 close="close();" title="Print Preview" xmlns:BarCode="BarCode.*"
+                                 xmlns:components="org.everest.flex.ui.components.*">
+
+    <components:layout>
+        <s:VerticalLayout paddingTop="5" paddingBottom="5" paddingRight="5" paddingLeft="5"/>
+    </components:layout>
+
+    <fx:Script>
+        <![CDATA[
+            import mx.collections.ArrayCollection;
+            import mx.collections.IList;
+            import mx.controls.dataGridClasses.DataGridColumn;
+            import mx.core.FlexGlobals;
+            import mx.core.IFlexDisplayObject;
+            import mx.managers.PopUpManager;
+            import mx.printing.FlexPrintJob;
+            import mx.printing.FlexPrintJobScaleType;
+            import mx.printing.PrintDataGrid;
+
+            import spark.components.gridClasses.GridColumn;
+
+            private var _columns:Array = new Array();
+
+            // Handle the close button and Cancel button.
+            public function close():void {
+                PopUpManager.removePopUp(this);
+            }
+
+
+            public static function show(parent:DisplayObject, columns:IList, dataProvider:IList):void{
+                var  p:IFlexDisplayObject = PopUpManager.createPopUp(parent, PrintPreView, true);
+                var pv:PrintPreView = PrintPreView(p)
+                pv.columns = columns.toArray();
+
+                pv.printDataGrid.dataProvider = dataProvider;
+                PopUpManager.centerPopUp(p);
+            }
+
+            protected function printDatagrid(event:MouseEvent):void
+            {
+                var printJob:FlexPrintJob = new FlexPrintJob();
+
+                if (printJob.start())
+                {
+                    printDataGrid.width = printJob.pageWidth;
+                    printDataGrid.height = printJob.pageHeight;
+                    printJob.addObject(printDataGrid);
+
+                    while (printDataGrid.validNextPage) {
+                        //Put the next page of data in the view.
+                        printDataGrid.nextPage();
+                        //Queue the additional page.
+                        printJob.addObject(printDataGrid);
+                    }
+                    printJob.send();
+
+                    this.close();
+                }
+
+            }
+
+            [Bindable]
+            public function get columns():Array
+            {
+                return _columns;
+            }
+
+            public function set columns(sparkColumns:Array):void
+            {
+                _columns = new Array();
+                for each (var sparkColumn:GridColumn in sparkColumns)
+                {
+                    var tmpColumn:DataGridColumn = new DataGridColumn();
+                        tmpColumn.headerText=sparkColumn.headerText;
+                        tmpColumn.dataField = sparkColumn.dataField;
+                        tmpColumn.labelFunction = sparkColumn.labelFunction;
+                    //                    	tmpColumn.headerText=sparkColumn.headerText;
+                    _columns.push(tmpColumn);
+                }
+
+                columnsDataGrid.dataProvider = new ArrayCollection(_columns);
+            }
+
+        ]]>
+    </fx:Script>
+    <s:HGroup>
+        <s:Label text="Columns for print" width="200" fontWeight="bold"/>
+        <s:Label text="Preview" />
+    </s:HGroup>
+    <s:HGroup width="100%" height="100%">
+        <s:DataGrid id="columnsDataGrid" width="200" height="100%">
+            <s:columns>
+                <s:ArrayList>
+                    <s:GridColumn headerText="Column" dataField="headerText"/>
+                    <s:GridColumn headerText="Print" dataField="visible">
+                        <s:itemRenderer>
+                            <fx:Component>
+                                <s:GridItemRenderer>
+                                    <s:CheckBox label="" selected="{data.visible}" horizontalCenter="0" change="{data.visible = !data.visible}" />
+                                </s:GridItemRenderer>
+                            </fx:Component>
+                        </s:itemRenderer>
+                    </s:GridColumn>
+                </s:ArrayList>
+            </s:columns>
+        </s:DataGrid>
+            <mx:PrintDataGrid id="printDataGrid" visible="true" columns="{columns}"
+                              width="100%" height="100%" />
+    </s:HGroup>
+
+    <s:Form width="100%">
+        <s:FormItem width="100%">
+            <s:HGroup>
+                <s:Button label="print" id="print" click="printDatagrid(event)"/>
+                <s:Button label="cancel" click="{close()}" />
+            </s:HGroup>
+        </s:FormItem>
+    </s:Form>
+
+</components:ResizableTitleWindow>

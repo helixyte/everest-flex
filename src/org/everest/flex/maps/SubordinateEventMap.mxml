@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\SubordinateEventMap.mxml -->
+<!---
+Mate framework event handler definition for subordinate REST requests.
+@see http://mate.asfusion.com/page/documentation/tags/eventmap
+-->
+<LocalEventMap xmlns="http://mate.asfusion.com/"
+               xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               cache="local" xmlns:utils="org.everest.flex.utils.*">
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.CollectionEvent;
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.events.SubordinateEvent;
+
+            import org.everest.flex.utils.TraceUtils;
+
+            import mx.events.FlexEvent;
+
+
+
+            [Bindable]
+            public var manager:Class;
+
+            [Bindable]
+            public var presenter:Class;
+
+            [Bindable]
+            public var view:Class;
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- Events -->
+        <EventHandlers type="{FlexEvent.CREATION_COMPLETE}"
+                       start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE', dispatcher)"
+                       end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE', dispatcher)">
+        </EventHandlers>
+
+        <EventHandlers type="{SubordinateEvent.LOAD_FEED}"
+                       start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'SubordinateEvent.LOAD_FEED', dispatcher)"
+                       end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'SubordinateEvent.LOAD_FEED', dispatcher)">
+            <utils:RestServiceInvoker url="{event.url}" resultFormat="e4x"
+                                method="GET">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{manager}" method="loadFeed"
+                        arguments="{[resultObject]}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Property targetKey="content" source="fault"
+                                  sourceKey="content"/>
+                        <Property targetKey="faultCode" source="fault"
+                                  sourceKey="faultCode"/>
+                        <Property targetKey="faultDetail" source="fault"
+                                  sourceKey="faultDetail"/>
+                        <Property targetKey="faultString" source="fault"
+                                  sourceKey="faultString"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{CollectionEvent.SELECT_MEMBERS}"
+                       start="trace('Start of actions SELECT_MEMBERS');"
+                       end="trace('End of actions SELECT_MEMBERS');">
+            <MethodInvoker generator="{manager}"
+                           method="selectMembers"
+                           arguments="{event.members}" />
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{view}"
+                   start="TraceUtils.traceMessage(TraceUtils.START_INJECTOR_MSG, view, dispatcher)"
+                   end="TraceUtils.traceMessage(TraceUtils.END_INJECTOR_MSG, view, dispatcher)">
+            <ObjectBuilder generator="{manager}" cache="local"/>
+            <ObjectBuilder generator="{presenter}"
+                           constructorArguments="{scope.dispatcher}" />
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{presenter}"
+                   start="TraceUtils.traceMessage(TraceUtils.START_INJECTOR_MSG, presenter, dispatcher)"
+                   end="TraceUtils.traceMessage(TraceUtils.END_INJECTOR_MSG, presenter, dispatcher)">
+            <PropertyInjector targetKey="members"
+                              source="{manager}"
+                              sourceKey="members" />
+            <PropertyInjector targetKey="selectedMembers"
+                              source="{manager}"
+                              sourceKey="selectedMembers" />
+        </Injectors>
+    </fx:Declarations>
+</LocalEventMap>

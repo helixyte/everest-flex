@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\CollectionEventMap.mxml -->
+<!---
+Mate framework event handler definition for all REST collection views.
+@see http://mate.asfusion.com/page/documentation/tags/eventmap
+@see org.everest.flex.ui.views.CollectionView
+@see org.everest.flex.ui.presenters.CollectionPresentationModel
+-->
+<LocalEventMap xmlns="http://mate.asfusion.com/"
+               xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               cache="local" xmlns:utils="org.everest.flex.utils.*">
+    <fx:Script>
+        <![CDATA[
+            import com.asfusion.mate.actionLists.IScope;
+            import org.everest.flex.model.ResourceState;
+
+            import org.everest.flex.events.CollectionEvent;
+            import org.everest.flex.events.DocumentEvent;
+            import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.model.managers.CollectionManager;
+
+            import mx.events.FlexEvent;
+            import mx.managers.CursorManager;
+            public var contentType:String;
+
+            [Bindable]
+            public var manager:Class = CollectionManager;
+
+            [Bindable]
+            public var presenter:Class;
+
+            [Bindable]
+            public var view:Class;
+
+            protected const START_HANDLER_MSG:String = "Start of actions";
+            protected const END_HANDLER_MSG:String = "End of actions";
+            protected const START_INJECTOR_MSG:String = "Start of injections";
+            protected const END_INJECTOR_MSG:String = "End of injections";
+
+            protected function stopDocumentLoadedHandler(scope:IScope):Boolean
+            {
+                var result:Boolean =
+                    (DocumentEvent(scope.event).document.type != contentType);
+                if (result) {
+                    trace("- Event handling stopped!");
+                    trace("  document type:" +
+                          DocumentEvent(scope.event).document.type);
+                    trace("  content type:" + contentType);
+                }
+                return result;
+            }
+
+            protected function getClassName(object:*):String
+            {
+                return getQualifiedClassName(object).split("::")[1];
+            }
+
+            protected function traceMessage(message:String, target:*):void
+            {
+                var msg:String = '* ' + getClassName(dispatcher) +
+                                 ' :: ' + message;
+                var targetName:String;
+                if (target is String) {
+                    targetName = target;
+                }
+                else {
+                    targetName = getClassName(target);
+                }
+                msg += ' for ' + targetName;
+                trace(msg);
+            }
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- Events -->
+        <EventHandlers type="{FlexEvent.CREATION_COMPLETE}"
+                       start="traceMessage(START_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE')"
+                       end="traceMessage(END_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE')">
+        </EventHandlers>
+
+        <EventHandlers type="{DocumentEvent.DOCUMENT_LOADED}"
+                       dispatcherType="global"
+                       start="traceMessage(START_HANDLER_MSG, 'DocumentEvent.DOCUMENT_LOADED')"
+                       end="traceMessage(END_HANDLER_MSG, 'DocumentEvent.DOCUMENT_LOADED')">
+            <StopHandlers stopFunction="stopDocumentLoadedHandler"
+                          eventPropagation="noStop"/>
+            <MethodInvoker generator="{manager}" cache="local"
+                           method="loadFeed"
+                           arguments="{event.document}" />
+        </EventHandlers>
+
+        <EventHandlers type="{RestFaultEvent.ERROR}"
+                       dispatcherType="global"
+                       start="traceMessage(START_HANDLER_MSG, 'RestFaultEvent.ERROR')"
+                       end="traceMessage(END_HANDLER_MSG, 'RestFaultEvent.ERROR')">
+            <MethodInvoker generator="{presenter}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_REQUEST}" />
+        </EventHandlers>
+
+        <EventHandlers type="{CollectionEvent.SELECT_MEMBERS}"
+                       start="traceMessage(START_HANDLER_MSG, 'CollectionEvent.SELECT_MEMBERS')"
+                       end="traceMessage(END_HANDLER_MSG, 'CollectionEvent.SELECT_MEMBERS')">
+            <MethodInvoker generator="{manager}"
+                           method="selectMembers"
+                           arguments="{event.members}" />
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.DELETE_MEMBER}"
+                       start="traceMessage(START_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')"
+                       end="traceMessage(END_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')">
+            <utils:RestServiceInvoker url="{event.member.selfLink}"
+                                resultFormat="text" contentType="text/plain"
+                                method="POST" request="{' '}"
+                                headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{manager}" method="removeMember"
+                        arguments="{event.member}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Property targetKey="content" source="fault"
+                                  sourceKey="content"/>
+                        <Property targetKey="faultCode" source="fault"
+                                  sourceKey="faultCode"/>
+                        <Property targetKey="faultDetail" source="fault"
+                                  sourceKey="faultDetail"/>
+                        <Property targetKey="faultString" source="fault"
+                                  sourceKey="faultString"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{view}"
+                   start="traceMessage(START_INJECTOR_MSG, view)"
+                   end="traceMessage(END_INJECTOR_MSG, view)">
+            <ObjectBuilder generator="{manager}" cache="local" />
+            <ObjectBuilder generator="{presenter}"
+                           constructorArguments="{scope.dispatcher}" />
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{presenter}"
+                   start="traceMessage(START_INJECTOR_MSG, presenter)"
+                   end="traceMessage(END_INJECTOR_MSG, presenter)">
+            <PropertyInjector targetKey="members"
+                              source="{manager}"
+                              sourceKey="members" />
+            <PropertyInjector targetKey="feedInfo"
+                              source="{manager}"
+                              sourceKey="feedInfo" />
+            <PropertyInjector targetKey="selectedMembers"
+                              source="{manager}"
+                              sourceKey="selectedMembers" />
+        </Injectors>
+    </fx:Declarations>
+</LocalEventMap>

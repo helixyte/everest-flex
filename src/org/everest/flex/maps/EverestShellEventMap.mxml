@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\EverestShellEventMap.mxml -->
+<!---
+Mate framework event handler definition for the everest shell. It is the central
+part of any everest Flex application and controls the entire lifecyle of the
+application.
+@see http://mate.asfusion.com/page/documentation/tags/eventmap
+-->
+<EventMap xmlns="http://mate.asfusion.com/"
+          xmlns:fx="http://ns.adobe.com/mxml/2009"
+          xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:utils="org.everest.flex.utils.*"
+          xmlns:model="org.everest.flex.shell.model.*"
+          xmlns:mx="library://ns.adobe.com/flex/mx">
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.events.NavigationEvent;
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.model.EverestConfiguration;
+            import org.everest.flex.model.ResourceState;
+            import org.everest.flex.model.managers.EverestShellManager;
+            import org.everest.flex.ui.presenters.ShellPresentationModel;
+            import org.everest.flex.ui.views.EverestShellView;
+
+            import mx.core.FlexGlobals;
+            import mx.events.FlexEvent;
+            import mx.managers.BrowserManager;
+            import mx.managers.CursorManager;
+
+            [Bindable]
+            public var everestConfiguration:EverestConfiguration;
+
+            private function getPageTitle():String
+            {
+                return FlexGlobals.topLevelApplication.pageTitle;
+            }
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- InjectorSettings -->
+        <InjectorSettings eventType="{FlexEvent.PREINITIALIZE}" />
+
+        <!-- Events
+        <EventHandlers type="{FlexEvent.PREINITIALIZE}"
+                       start="trace('* Start of FlexEvent.PREINITIALIZE handling!')"
+                       end="trace('* End of FlexEvent.PREINITIALIZE handling!')">
+
+        </EventHandlers>
+        -->
+
+        <EventHandlers type="{FlexEvent.APPLICATION_COMPLETE}"
+                       start="trace('* Start of FlexEvent.APPLICATION_COMPLETE handling!')"
+                       end="trace('* End of FlexEvent.APPLICATION_COMPLETE handling!')">
+
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="loadConfiguration"
+                           arguments="{everestConfiguration}" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="initBrowserManager"
+                           arguments="{BrowserManager.getInstance()}" />
+        </EventHandlers>
+
+        <EventHandlers type="{NavigationEvent.LOAD_HOME}"
+                       start="trace('* Start of NavigationEvent.LOAD_HOME handling!')"
+                       end="trace('* End of NavigationEvent.LOAD_HOME handling!')">
+            <MethodInvoker
+                generator="{EverestShellManager}" method="loadHome" />
+        </EventHandlers>
+
+        <EventHandlers type="{NavigationEvent.LOAD_MODULE}"
+                       start="trace('* Start of NavigationEvent.LOAD_MODULE handling!')"
+                       end="trace('* End of NavigationEvent.LOAD_MODULE handling!')">
+            <MethodInvoker
+                generator="{EverestShellManager}" method="loadModule"
+                arguments="{[event.contentType, event.pageUrl]}"/>
+        </EventHandlers>
+
+        <EventHandlers type="{NavigationEvent.LOAD_PAGE}"
+                       start="trace('* Start of NavigationEvent.LOAD_PAGE handling!')"
+                       end="trace('* End of NavigationEvent.LOAD_PAGE handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_RESPONSE}" />
+            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
+                                method="GET" contentType="application/zip">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{EverestShellManager}" method="loadDocument"
+                        arguments="{[event.pageUrl, resultObject]}" />
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+
+        <EventHandlers type="{NavigationEvent.LOAD_SUBORDINATE_PAGE}"
+                       start="trace('* Start of NavigationEvent.LOAD_SUBORDINATE_PAGE handling!')"
+                       end="trace('* End of NavigationEvent.LOAD_SUBORDINATE_PAGE handling!')">
+            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
+                                      method="GET">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{EverestShellManager}" method="loadSubDocument"
+                        arguments="{[resultObject]}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+
+        <EventHandlers type="{MemberEvent.CREATE_MEMBER_FROM_XLS}"
+                       start="trace('* Start of MemberEvent.CREATE_MEMBER_FROM_XLS handling!')"
+                       end="trace('* End of MemberEvent.CREATE_MEMBER_FROM_XLS handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_RESPONSE}" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="getCurrentBaseUrl" />
+
+            <utils:RestServiceInvoker  url="{lastReturn}" resultFormat="e4x"
+                                contentType="application/vnd.xls"
+                                method="POST" request="{event.binaryData}">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{EverestShellManager}" method="loadDocument"
+                        arguments="{[event.pageUrl, resultObject]}" />
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.CREATE_MEMBER}"
+                       start="trace('* Start of MemberEvent.CREATE_MEMBER handling!')"
+                       end="trace('* End of MemberEvent.CREATE_MEMBER handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_RESPONSE}" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="getCurrentBaseUrl"  />
+            <DataCopier source="lastReturn" destination="event" destinationKey="pageUrl" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="serializeMember"
+                           arguments="{event.member}" />
+            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
+                          contentType="application/xml"
+                          method="POST" request="{lastReturn}">
+                <utils:resultHandlers>
+                    <!--<MethodInvoker
+                        generator="{ShellManager}" method="loadDocument"
+                        arguments="{[event.pageUrl, resultObject]}" />-->
+                    <!-- we need to reload the member because the reply content does not contain id fields -->
+                    <!-- this might get fixed in a future everest release. -->
+                    <MethodInvoker
+                        generator="{EverestShellManager}" method="loadNewMember"
+                        arguments="{[event.pageUrl, resultObject]}" />
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.CREATE_MEMBER_IN_BACKGROUND}"
+                       start="trace('* Start of MemberEvent.CREATE_MEMBER_IN_BACKGROUND handling!')"
+                       end="trace('* End of MemberEvent.CREATE_MEMBER_IN_BACKGROUND handling!')">
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="getCurrentBaseUrl"  />
+            <DataCopier source="lastReturn" destination="event" destinationKey="pageUrl" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="serializeMember"
+                           arguments="{event.member}" />
+            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
+                                      contentType="application/xml"
+                                      method="POST" request="{lastReturn}">
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.EDIT_MEMBER}"
+                       start="trace('* Start of MemberEvent.EDIT_MEMBER handling!')"
+                       end="trace('* End of MemberEvent.EDIT_MEMBER handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_RESPONSE}" />
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="serializeMember"
+                           arguments="{event.member}" />
+            <utils:RestServiceInvoker url="{event.member.selfLink}" resultFormat="e4x"
+                                contentType="application/xml"
+                                method="POST" request="{lastReturn}"
+                                headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+                <utils:resultHandlers>
+                   <MethodInvoker
+                        generator="{EverestShellManager}" method="loadDocument"
+                        arguments="{[event.pageUrl, resultObject]}" />
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.EDIT_MEMBER_IN_BACKGROUND}"
+                       start="trace('* Start of MemberEvent.EDIT_MEMBER_IN_BACKGROUND handling!')"
+                       end="trace('* End of MemberEvent.EDIT_MEMBER_IN_BACKGROUND handling!')">
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="serializeMember"
+                           arguments="{event.member}" />
+            <utils:RestServiceInvoker url="{event.member.selfLink}" resultFormat="e4x"
+                                      contentType="application/xml"
+                                      method="POST" request="{lastReturn}"
+                                      headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.UPDATE_MEMBER_FROM_XLS}"
+                       start="trace('* Start of MemberEvent.UPDATE_MEMBER_FROM_XLS handling!')"
+                       end="trace('* End of MemberEvent.UPDATE_MEMBER_FROM_XLS handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_RESPONSE}" />
+            <utils:RestServiceInvoker  url="{event.member.selfLink}" resultFormat="e4x"
+                                       contentType="application/vnd.xls"
+                                       method="POST" request="{event.binaryData}"
+                                       headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+                <utils:resultHandlers>
+                    <MethodInvoker
+                        generator="{EverestShellManager}" method="loadMember"
+                        arguments="{resultObject}" />
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <EventHandlers type="{RestFaultEvent.ERROR}"
+                       start="trace('* Start of MessageEvent.ERROR handling!')"
+                       end="trace('* End of MessageEvent.ERROR handling!')">
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_REQUEST}" />
+            <MethodInvoker generator="{ShellPresentationModel}"
+                           method="showRestFault"
+                           arguments="{[event]}" />
+        </EventHandlers>
+
+        <EventHandlers type="{NavigationEvent.NEW_WINDOW}"
+                       start="trace('* Start of NavigationEvent.NEW_WINDOW handling!')"
+                       end="trace('* End of NavigationEvent.NEW_WINDOW handling!')">
+            <MethodInvoker generator="{EverestShellManager}"
+                           method="loadPageNewWindow"
+                           arguments="{event.pageUrl}" />
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{EverestShellView}"
+                   start="trace('* Start of ShellView injections!')"
+                   end="trace('* End of ShellView injections!')">
+            <ObjectBuilder generator="{EverestShellManager}"
+                           constructorArguments="{scope.dispatcher}">
+                <Properties pageTitle="{getPageTitle()}" />
+            </ObjectBuilder>
+            <ObjectBuilder generator="{ShellPresentationModel}"
+                           constructorArguments="{scope.dispatcher}">
+              <!--  <Properties appServiceUrl="{lastReturn.appServiceUrl}"/> -->
+              <!--  <Properties appRelease="{lastReturn.appRelease}"/> -->
+            </ObjectBuilder>
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{ShellPresentationModel}"
+                   start="trace('* Start of ShellPresentationModel injections!')"
+                   end="trace('* End of ShellPresentationModel injections!')">
+            <PropertyInjector targetKey="selectedIndex"
+                              source="{EverestShellManager}"
+                              sourceKey="selectedIndex"/>
+            <PropertyInjector targetKey="currentUser"
+                              source="{EverestShellManager}"
+                              sourceKey="currentUser"/>
+            <PropertyInjector targetKey="document"
+                              source="{EverestShellManager}"
+                              sourceKey="document"/>
+            <PropertyInjector targetKey="subDocument"
+                              source="{EverestShellManager}"
+                              sourceKey="subDocument"/>
+        </Injectors>
+
+    </fx:Declarations>
+</EventMap>

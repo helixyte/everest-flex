@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\DataGrid.mxml -->
+<!---
+An extention of a normal spark DataGrid. It offers a right-click context menu to
+select, copy or print rows.
+-->
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:s="library://ns.adobe.com/flex/spark"
+            xmlns:mx="library://ns.adobe.com/flex/mx"
+            width="400" height="300"
+            selectionMode="multipleRows"
+            copy="copyHandler(event)"
+            selectAll="selectAllHandler(event)"
+            creationComplete="creationCompleteHandler(event)">
+
+    <fx:Script>
+        <![CDATA[
+            import com.adobe.utils.StringUtil;
+            import flash.desktop.Clipboard;
+            import flash.desktop.ClipboardFormats;
+
+            import mx.collections.ArrayCollection;
+            import mx.collections.IList;
+
+            import org.everest.flex.ui.components.print.PrintPreView;
+
+            import spark.components.gridClasses.GridColumn;
+
+            [Bindable]
+            public var enableCopy : Boolean = true;
+
+            protected function creationCompleteHandler(event:Event):void
+            {
+                contextMenu = createContextMenu();
+            }
+
+            protected function createContextMenu():ContextMenu
+            {
+                var copyItem:ContextMenuItem = new ContextMenuItem("Copy selected rows", false);
+                    copyItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, copyHandler);
+
+                var printItem:ContextMenuItem = new ContextMenuItem("Print selected rows", false);
+                    printItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, printSelectedRows);
+
+                var selectAllItem:ContextMenuItem = new ContextMenuItem("Select all rows", true);
+                    selectAllItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, selectAllFromMenu);
+
+                var cm:ContextMenu = new ContextMenu();
+                    cm.hideBuiltInItems();
+                    cm.customItems = [copyItem, printItem, selectAllItem];
+
+                return cm;
+            }
+
+            public function printSelectedRows(event:Event=null):void
+            {
+                if (selectedItems != null)
+                {
+                    var dbDp:ArrayCollection = new ArrayCollection();
+                    for each (var row:* in selectedItems)
+                    {
+                        dbDp.addItem(row);
+                    }
+
+                    PrintPreView.show(this, columns, dbDp );
+                }
+
+            }
+            protected function selectAllFromMenu(event:Event):void{
+                this.setFocus();
+                this.selectAll();
+            }
+
+            protected function copyHandler(event:Event):void
+            {
+                event.preventDefault();
+                Clipboard.generalClipboard.clear();
+                Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT,
+                                                   dataGridSelectionText("\t", "\n"));
+            }
+
+            private function dataGridSelectionText(fieldSeparator:String, rowSeparator:String):String
+            {
+                const columns:IList = columns;
+                const dataProvider:IList = dataProvider;
+
+                var text:String = "";
+
+                //first convert the headers to csv text
+                for (var j:int = 0; j < columnsLength; j++)
+                {
+                    if (j>0) text += fieldSeparator;
+                    var headerColumn:GridColumn = columns.getItemAt(j) as GridColumn;
+                    text += exportText(headerColumn.headerText, headerColumn);
+                }
+                text += rowSeparator;
+
+                //then go through all the columns and add the csv text
+                for each (var rowIndex:int in selectedIndices)
+                {
+                    for (var i:int = 0; i < columnsLength; i++)
+                    {
+                        if (i>0) text += fieldSeparator;
+                        var column:GridColumn = columns.getItemAt(i) as GridColumn;
+                        var row:Object = dataProvider.getItemAt(rowIndex);
+                        var value:Object;
+                        if (column.labelFunction != null)
+                        {
+                            value = column.labelFunction(row, column);
+
+                        } else if (row.hasOwnProperty(column.dataField))
+                        {
+                            value = row[column.dataField];
+                        }
+
+
+                        text += exportText(value, column);
+
+                    }
+
+
+                    text += rowSeparator;
+                }
+
+                return text;
+            }
+
+            public function exportText(item:Object, column:GridColumn):String
+            {
+                if (item != null)
+                {
+                    var result:String = item.toString();
+                        result = StringUtil.replace(result,"\n"," | ");
+                        result = StringUtil.replace(result,"\t"," ");
+                    return result;
+                } else {
+                    return "";
+                }
+
+            }
+        ]]>
+    </fx:Script>
+</s:DataGrid>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\MemberEventMap.mxml -->
+<!---
+Mate framework event handler definition for all REST member views.
+@see http://mate.asfusion.com/page/documentation/tags/eventmap
+-->
+<LocalEventMap xmlns="http://mate.asfusion.com/"
+               xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               cache="local" xmlns:utils="org.everest.flex.utils.*" >
+    <fx:Script>
+        <![CDATA[
+            import com.asfusion.mate.actionLists.IScope;
+
+            import org.everest.flex.events.DocumentEvent;
+            import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.events.NavigationEvent;
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.model.managers.MemberManager;
+
+            import mx.events.FlexEvent;
+            import mx.managers.CursorManager;
+
+            [Bindable]
+            public var contentType:String;
+
+            [Bindable]
+            public var manager:Class = MemberManager;
+
+            [Bindable]
+            public var presenter:Class;
+
+            [Bindable]
+            public var view:Class;
+
+            protected const START_HANDLER_MSG:String = "Start of actions";
+            protected const END_HANDLER_MSG:String = "End of actions";
+            protected const START_INJECTOR_MSG:String = "Start of injections";
+            protected const END_INJECTOR_MSG:String = "End of injections";
+
+            protected function stopDocumentLoadedHandler(scope:IScope):Boolean
+            {
+                var result:Boolean =
+                    (DocumentEvent(scope.event).document.type != contentType);
+                if (result) {
+                    trace("- Event handling stopped!");
+                    trace("  document type:" +
+                        DocumentEvent(scope.event).document.type);
+                    trace("  content type:" + contentType);
+                }
+                return result;
+            }
+
+            protected function stopSubDocumentLoadedHandler(scope:IScope):Boolean
+            {
+                var result:Boolean =
+                    (DocumentEvent(scope.event).document.type != contentType);
+                if (result) {
+                    trace("- Event handling stopped!");
+                    trace("  sub document type:" +
+                        DocumentEvent(scope.event).document.type);
+                    trace("  content type:" + contentType);
+                }
+                return result;
+            }
+
+            protected function getClassName(object:*):String
+            {
+                return getQualifiedClassName(object).split("::")[1];
+            }
+
+            protected function traceMessage(message:String, target:*):void
+            {
+                var msg:String = '* ' + getClassName(dispatcher) +
+                    ' :: ' + message;
+                var targetName:String;
+                if (target is String) {
+                    targetName = target;
+                }
+                else {
+                    targetName = getClassName(target);
+                }
+                msg += ' for ' + targetName;
+                trace(msg);
+            }
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- Events -->
+        <EventHandlers type="{FlexEvent.CREATION_COMPLETE}"
+                       start="traceMessage(START_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE')"
+                       end="traceMessage(END_HANDLER_MSG, 'FlexEvent.CREATION_COMPLETE')">
+        </EventHandlers>
+
+        <EventHandlers type="{DocumentEvent.DOCUMENT_LOADED}"
+                       dispatcherType="global"
+                       start="traceMessage(START_HANDLER_MSG, 'DocumentEvent.DOCUMENT_LOADED')"
+                       end="traceMessage(END_HANDLER_MSG, 'DocumentEvent.DOCUMENT_LOADED')">
+            <StopHandlers stopFunction="stopDocumentLoadedHandler"
+                          eventPropagation="noStop"/>
+            <MethodInvoker generator="{manager}" cache="local"
+                           method="loadEntry"
+                           arguments="{event.document}" />
+        </EventHandlers>
+
+        <EventHandlers type="{DocumentEvent.SUB_DOCUMENT_LOADED}"
+                       dispatcherType="global"
+                       start="traceMessage(START_HANDLER_MSG, 'DocumentEvent.SUB_DOCUMENT_LOADED')"
+                       end="traceMessage(END_HANDLER_MSG, 'DocumentEvent.SUB_DOCUMENT_LOADED')">
+         <!--   <StopHandlers stopFunction="stopSubDocumentLoadedHandler"
+                          eventPropagation="noStop"/> -->
+            <MethodInvoker generator="{manager}" cache="local"
+                           method="loadSubEntry"
+                           arguments="{event.document}" />
+        </EventHandlers>
+
+        <EventHandlers type="{MemberEvent.DELETE_MEMBER}"
+                       start="traceMessage(START_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')"
+                       end="traceMessage(END_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')">
+            <utils:RestServiceInvoker url="{event.member.selfLink}"
+                                resultFormat="text" contentType="text/plain"
+                                method="POST" request="{' '}"
+                                headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
+                <utils:resultHandlers>
+                    <EventAnnouncer generator="{NavigationEvent}" bubbles="true"
+                                    type="{NavigationEvent.LOAD_HOME}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Property targetKey="content" source="fault"
+                                  sourceKey="content"/>
+                        <Property targetKey="faultCode" source="fault"
+                                  sourceKey="faultCode"/>
+                        <Property targetKey="faultDetail" source="fault"
+                                  sourceKey="faultDetail"/>
+                        <Property targetKey="faultString" source="fault"
+                                  sourceKey="faultString"/>
+                        <Property targetKey="location" source="fault"
+                                  sourceKey="location"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
+            </utils:RestServiceInvoker>
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{view}"
+                   start="traceMessage(START_INJECTOR_MSG, view)"
+                   end="traceMessage(END_INJECTOR_MSG, view)">
+            <ObjectBuilder generator="{manager}" cache="local" />
+            <ObjectBuilder generator="{presenter}"
+                           constructorArguments="{scope.dispatcher}" />
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{presenter}"
+                   start="traceMessage(START_INJECTOR_MSG, presenter)"
+                   end="traceMessage(END_INJECTOR_MSG, presenter)">
+            <PropertyInjector targetKey="member"
+                              source="{manager}"
+                              sourceKey="member" />
+            <PropertyInjector targetKey="subMember"
+                              source="{manager}"
+                              sourceKey="subMember" />
+            <PropertyInjector targetKey="subMembers"
+                              source="{manager}"
+                              sourceKey="subMembers" />
+        </Injectors>
+    </fx:Declarations>
+</LocalEventMap>

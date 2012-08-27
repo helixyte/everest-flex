@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\MemberDataGrid.mxml -->
+<!---
+This is an extended Datagrid that encapsulates and displays a collection of
+member objects. It is normally used in a collection view and takes a
+CollectionPresentationModel as model.
+-->
+<components:MultiColSortableDataGrid
+                     xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:components="org.everest.flex.ui.components.*"
+                     width="100%" height="100%"
+                     skinClass="org.everest.flex.ui.skins.MultiColSortableDataGridSkin"
+                     creationComplete="creationCompleteHandler(event)"
+                     doubleClick="doubleClickHandler(event)"
+                     sortableColumns="true"
+                     doubleClickEnabled="true" >
+    <fx:Script>
+        <![CDATA[
+            import mx.binding.utils.BindingUtils;
+            import mx.collections.ArrayCollection;
+
+            import org.everest.flex.events.NavigationLinkEvent;
+            import org.everest.flex.events.SubordinateEvent;
+            import org.everest.flex.ui.presenters.CollectionPresentationModel;
+
+            import spark.collections.SortField;
+            import spark.components.gridClasses.GridColumn;
+
+            [Bindable]
+            private var _feedUrl:String;
+
+            public var _filterFunction:Function;
+
+            protected override function creationCompleteHandler(event:Event):void
+            {
+                super.creationCompleteHandler(event);
+                addEventListener(NavigationLinkEvent.GOTO_LINK, navigateToLinkHandler);
+            }
+
+            public function get feedUrl():String
+            {
+                return _feedUrl;
+            }
+
+            public function set feedUrl(value:String):void
+            {
+                _feedUrl = value;
+                loadFeed();
+            }
+
+            [Bindable]
+            private var _model:CollectionPresentationModel;
+
+            public function get model():CollectionPresentationModel
+            {
+                return _model;
+            }
+
+            public function set model(value:CollectionPresentationModel):void
+            {
+                selectedItems
+                _model = value;
+
+                if (_model != null)
+                {
+                    BindingUtils.bindProperty(
+                        this, "dataProvider", _model, "members"
+                    );
+                    BindingUtils.bindProperty(
+                        _model, "selectedMembers", this, "selectedItems"
+                    );
+                }
+
+                if(_filterFunction != null){
+                   ArrayCollection(dataProvider).filterFunction = _filterFunction;
+                   ArrayCollection(dataProvider).refresh();
+                }
+            }
+
+            public function set filterFunction(func:Function):void{
+
+                this._filterFunction = func;
+
+                if(dataProvider != null){
+                    ArrayCollection(dataProvider).filterFunction  = func;
+                    ArrayCollection(dataProvider).refresh();
+                }
+            }
+
+            public override function sortByMultiColumns(columnIndices:Vector.<int>, isInteractive:Boolean = false , multiColSort:Boolean = false):Boolean
+            {
+                if (_model.selectedPageSize != null && _model.totalResults < _model.selectedPageSize.data) {
+                    //let the DataGrid handle the sorting
+                    return super.sortByMultiColumns(columnIndices, isInteractive, multiColSort);
+                } else {
+                    //let the Server do the sorting
+                    var sortFields:Array = createSortFields(columnIndices, null, isInteractive);
+                    if (!sortFields){
+                        return false;
+                    }
+
+                    _model.sortMembersBy(sortFields, multiColSort);
+
+                    var headerIndices:Vector.<int> = new Vector.<int>();
+
+                    for each (var field:SortField in model.sortFields){
+                        for (var i:int = 0; i < columns.length; i++)
+                        {
+                            var c:GridColumn = columns.getItemAt(i) as GridColumn;
+                            if (c.dataField == field.name)
+                            {
+                                c.sortDescending = field.descending;
+                                headerIndices.push(i);
+                            }
+                        }
+                    }
+
+                    if (columnHeaderGroup){
+                        columnHeaderGroup.visibleSortIndicatorIndices = headerIndices;
+                    }
+                    return true;
+                }
+            }
+
+            protected function navigateToLinkHandler(event:NavigationLinkEvent):void
+            {
+                _model.navigateToLink(event.link.href);
+            }
+
+            protected function doubleClickHandler(event:MouseEvent):void
+            {
+                if (selectedItem != null) {
+                    _model.navigateToMember(selectedItem)
+                }
+            }
+
+            protected function loadFeed():void
+            {
+                var evt:SubordinateEvent;
+                if (feedUrl != null) {
+                    evt = new SubordinateEvent(SubordinateEvent.LOAD_FEED);
+                    evt.url = feedUrl;
+                    dispatchEvent(evt);
+                }
+            }
+        ]]>
+    </fx:Script>
+</components:MultiColSortableDataGrid>

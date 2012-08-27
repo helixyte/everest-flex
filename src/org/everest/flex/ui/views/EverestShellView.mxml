@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+This view is the context in which every everest flex application is running.
+In the main application class the ShellEventMap needs to be initialzed with a
+custom configuration. Then the EverestShellView has to be added to the screen.
+Everything around can be
+customized depending on the application needs.
+
+@see org.everest.flex.ui.presenters.EverestShellPresentationModel
+@see org.everest.flex.modle.EverestConfiguration
+@see org.everest.flex.maps.EverestShellEventMap
+-->
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+          xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:mx="library://ns.adobe.com/flex/mx"
+          xmlns:components="org.everest.flex.ui.components.*" horizontalAlign="center"
+          paddingLeft="4" paddingRight="4" paddingTop="4" paddingBottom="4">
+
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.model.DocumentDescriptor;
+            import org.everest.flex.ui.components.ErrorView;
+            import org.everest.flex.ui.presenters.ShellPresentationModel;
+
+            import mx.events.FlexEvent;
+            import mx.events.ModuleEvent;
+
+            [Bindable]
+            public var model:ShellPresentationModel;
+
+            [Bindable]
+            public var loading:Boolean = true;
+
+            private function set currentDocument(doc:DocumentDescriptor):void
+            {
+                if((doc != null) && (moduleLoader.url != doc.moduleUrl)) {
+                    trace(doc.moduleUrl);
+                    if (doc.moduleUrl == "undefined")
+                    {
+//                        ErrorView.show(this, "No module was found for the type:\n"
+//                                             + doc.type + "\nPlease inform the IT department.");
+                        loading = false;
+//                        model.loadMenu();
+                    }else{
+                    // module loader should load a new module
+                        moduleLoader.url = doc.moduleUrl;
+                        loading = true;
+                    }
+                }
+                else {
+                    // the module is the same
+                    model.loadDocument();
+                }
+            }
+
+            private function set currentSubDocument(doc:DocumentDescriptor):void
+            {
+                    model.loadSubDocument();
+            }
+
+            private function loadDocument(event:FlexEvent):void
+            {
+                model.loadDocument();
+            }
+
+
+            private function moduleLoader_readyHandler(event:ModuleEvent):void
+            {
+                moduleLoader.child.addEventListener(FlexEvent.CREATION_COMPLETE, loadDocument);
+                trace("- Setting new event listener to child: " + moduleLoader.child);
+                loading = false;
+            }
+
+            protected function moduleLoader_errorHandler(event:ModuleEvent):void
+            {
+                ErrorView.show(event.errorText);
+                loading = false;
+            }
+
+        ]]>
+    </fx:Script>
+
+    <fx:Binding source="model.document" destination="currentDocument" />
+    <fx:Binding source="model.subDocument" destination="currentSubDocument" />
+
+    <s:ModuleLoader id="moduleLoader"  width="100%" height="100%"
+                    ready="moduleLoader_readyHandler(event)"
+                    error="moduleLoader_errorHandler(event)"/>
+
+</s:VGroup>
