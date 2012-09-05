@@ -8,14 +8,17 @@ the link will be loaded by the everest flex framework.
                xmlns:s="library://ns.adobe.com/flex/spark"
                xmlns:mx="library://ns.adobe.com/flex/mx"
                skinClass="org.everest.flex.ui.skins.LinkButtonSkin"
-               click="linkClickHandler()">
+               click="linkClickHandler()" creationComplete="creationCompleteHandler(event)">
     <fx:Script>
         <![CDATA[
+            import flash.desktop.Clipboard;
+            import flash.desktop.ClipboardFormats;
+
+            import mx.events.FlexEvent;
+
             import org.everest.flex.events.NavigationEvent;
             import org.everest.flex.interfaces.INavigationLink;
             import org.everest.flex.ui.presenters.MemberPresentationModel;
-
-            import mx.events.FlexEvent;
 
             [Bindable]
             private var _link:INavigationLink;
@@ -34,11 +37,37 @@ the link will be loaded by the everest flex framework.
             protected function linkClickHandler():void
             {
                 if (_link.href != null) {
-                    trace("- Goto Link: " + _link.href);
                     var event:NavigationEvent = new NavigationEvent(NavigationEvent.LOAD_PAGE);
                     event.pageUrl = _link.href;
                     dispatchEvent(event);
                 }
+            }
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                contextMenu = createContextMenu();
+            }
+
+
+            protected function openNewWindow(event:Event):void
+            {
+                event.preventDefault();
+
+                var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
+                    e.pageUrl = _link.href;
+                dispatchEvent(e);
+            }
+
+            protected function createContextMenu():ContextMenu
+            {
+                var newWindow:ContextMenuItem = new ContextMenuItem("Open Link in New Tab", false);
+                newWindow.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, openNewWindow);
+
+                var cm:ContextMenu = new ContextMenu();
+                cm.hideBuiltInItems();
+                cm.customItems = [newWindow];
+
+                return cm;
             }
 
         ]]>
