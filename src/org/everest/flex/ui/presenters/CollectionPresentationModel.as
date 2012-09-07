@@ -131,15 +131,8 @@ package org.everest.flex.ui.presenters
             if (selectedPageSize != pageSize) {
                 trace("- Goto First Page with " + pageSize.data + " items per page");
                 selectedPageSize = pageSize;
-                filterCollection();
             }
         }
-
-//        public function reset():void
-//        {
-//             criteria = new Criteria();
-//            resetInput();
-//        }
 
         public function navigateToMember(selectedMember:Object):void
         {
