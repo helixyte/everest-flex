@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- asdoc\MemberLinkButton.mxml -->
+<!-- asdoc\CsvLinkButton.mxml -->
 <!---
-A simple button that wraps around a INavigationLink object. When it is clicked
-the link will be loaded by the everest flex framework.
+A button used to download a collection as csv. It contains a context menu option
+to allow the user to just copy the link to the csv representation.
 -->
 <s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
                xmlns:s="library://ns.adobe.com/flex/spark"
