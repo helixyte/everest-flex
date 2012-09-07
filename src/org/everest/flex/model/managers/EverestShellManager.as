@@ -318,7 +318,8 @@ package org.everest.flex.model.managers
             var newUrl:String;
             var url:URL = new URL(pageUrl);
             if ((url.host == '') || (url.host == appUrl.host && url.port == appUrl.port)) {
-                newUrl = _browserManager.base + "#/" + url.path;
+                newUrl = _browserManager.base;
+                newUrl += newUrl.indexOf('#') > -1 ? "/" + url.path : "#/" + url.path;
                 if (url.query.length > 0) {
                     newUrl += "?" + url.query;
                 }
