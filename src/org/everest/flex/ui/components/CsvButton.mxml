@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\MemberLinkButton.mxml -->
+<!---
+A simple button that wraps around a INavigationLink object. When it is clicked
+the link will be loaded by the everest flex framework.
+-->
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               creationComplete="creationCompleteHandler(event)"
+               click="model.downloadCSV()">
+    <fx:Script>
+        <![CDATA[
+            import flash.desktop.Clipboard;
+            import flash.desktop.ClipboardFormats;
+
+            import mx.events.FlexEvent;
+
+            import org.everest.flex.ui.presenters.CollectionPresentationModel;
+
+            [Bindable]
+            public var model:CollectionPresentationModel;
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                contextMenu = createContextMenu();
+            }
+
+
+            protected function copyHandler(event:Event):void
+            {
+                event.preventDefault();
+                Clipboard.generalClipboard.clear();
+                Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, model.csvLink);
+            }
+
+            protected function createContextMenu():ContextMenu
+            {
+                var copy:ContextMenuItem = new ContextMenuItem("Copy CSV Link", false);
+                    copy.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, copyHandler);
+
+                var cm:ContextMenu = new ContextMenu();
+                    cm.hideBuiltInItems();
+                    cm.customItems = [copy];
+
+                return cm;
+            }
+
+        ]]>
+    </fx:Script>
+</s:Button>

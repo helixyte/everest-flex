@@ -252,7 +252,7 @@ package org.everest.flex.model.managers
             for each (var element:XML in entry.content[0].children()){
                 var member:Member = _schemaManager.decode(element);
                 member.title = entry.title;
-                member.selfLink = entry.link.(@rel=="self")[0].@href
+                member.selfLink = entry.link.(@rel=="self")[0].@href;
 
                 return member;
             }
@@ -317,7 +317,7 @@ package org.everest.flex.model.managers
         {
             var newUrl:String;
             var url:URL = new URL(pageUrl);
-            if (url.host == appUrl.host && url.port == appUrl.port) {
+            if ((url.host == '') || (url.host == appUrl.host && url.port == appUrl.port)) {
                 newUrl = _browserManager.base + "#/" + url.path;
                 if (url.query.length > 0) {
                     newUrl += "?" + url.query;

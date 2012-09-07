@@ -96,6 +96,7 @@ The additionalContent section goes below and it not intended to be editable.
             protected function reset(model:MemberPresentationModel):void
             {
                 currentState = ResourceState.VIEW;
+                animation.stop();
                 model.resetPage();
             }
 
@@ -103,10 +104,12 @@ The additionalContent section goes below and it not intended to be editable.
             protected function edit(event:MouseEvent):void
             {
                 currentState = ResourceState.EDIT;
+                animation.play([saveMember]);
             }
 
 
             public function submit(model:MemberPresentationModel):void{
+                animation.stop();
                 formValidator.validateForm(null);
                 if(formValidator.formIsValid){
                         currentState = ResourceState.PENDING_REQUEST;
@@ -145,7 +148,11 @@ The additionalContent section goes below and it not intended to be editable.
     <fx:Declarations>
         <fx:Array id="validators"/>
         <validators:FormValidator id="formValidator" validators="{validators}" />
-    </fx:Declarations>
+        <s:Sequence id="animation" repeatCount="0">
+            <s:AnimateColor colorPropertyName="chromeColor" colorFrom="{resetMember.getStyle('chromeColor')}" colorTo="#99ff00" duration="600"/>
+            <s:AnimateColor colorPropertyName="chromeColor" colorTo="{resetMember.getStyle('chromeColor')}" colorFrom="#99ff00" duration="600"/>
+        </s:Sequence>
+        </fx:Declarations>
     <s:states>
         <s:State name="pendingRequest" />
         <s:State name="pendingResponse" />

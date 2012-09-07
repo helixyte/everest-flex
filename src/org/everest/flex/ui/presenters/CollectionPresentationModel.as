@@ -94,6 +94,8 @@ package org.everest.flex.ui.presenters
 
         private var _generatorUri:String = "foobar";
 
+        private var _selfLink:String = "";
+
         private var _firstPageLink:String;
 
         private var _previousPageLink:String;
@@ -146,12 +148,24 @@ package org.everest.flex.ui.presenters
         }
 
         public function downloadCSV():void{
+
+            navigateToURL(new URLRequest(csvLink));
+
+        }
+
+        public function get csvLink():String{
             var params:Array = prepareRequestParams();
 
-            var url:String = _generatorUri.substr(_generatorUri.length - 1) == "/" ? _generatorUri.substr(0, _generatorUri.length - 1) : _generatorUri;
-                url +=  ".csv/?" + params.join("&");
+            var arr:Array = _selfLink.split('/?');
+            if (arr.length < 2)
+            {
+                arr = _selfLink.split('?');
+            }
 
-            navigateToURL(new URLRequest(url));
+//            var url:String = _selfLink.substr(_selfLink.length - 1) == "/" ? _selfLink.substr(0, _selfLink.length - 1) : _selfLink;
+//            url +=  ".csv/?" + params.join("&");
+
+            return arr.join(".csv?");
 
         }
 
@@ -379,6 +393,7 @@ package org.everest.flex.ui.presenters
         {
             if (info != null) {
                 _generatorUri = info.generatorUri;
+                _selfLink = info.selfLink;
                 firstPageLink = info.firstPageLink;
                 previousPageLink = info.previousPageLink;
                 nextPageLink = info.nextPageLink;

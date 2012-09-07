@@ -102,6 +102,7 @@ package org.everest.flex.model.managers
                 fi.startNumber = fi.totalResults > 0 ? (fi.startIndex + 1) : 0;
                 fi.endNumber = fi.startIndex + feed.atom::entry.length();
                 fi.itemsPerPage = int(feed.opensearch::itemsPerPage);
+                fi.selfLink = feed.atom::link.(@rel=="self")[0].@href
 
             return fi;
         }

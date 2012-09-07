@@ -298,9 +298,8 @@ extend.
                   enabled="{resultGrid.selectedItem != null}"
                   visible="false"
                   includeInLayout="false"/>
-        <s:Button id="csv" label="CSV"
-                  click="model.downloadCSV()"
-                  visible="{showCsvButton}" includeInLayout="{showCsvButton}"/>
+        <components:CsvButton id="csv" label="CSV" model="{model}"
+                              visible="{showCsvButton}" includeInLayout="{showCsvButton}"/>
         <s:Button id="print" label="Print" click="{resultGrid.printSelectedRows()}" enabled="{resultGrid.selectedItem != null}" />
         <s:Spacer width="100%"/>
         <s:HGroup id="footerContentGroup" includeInLayout="false" verticalAlign="middle"/>

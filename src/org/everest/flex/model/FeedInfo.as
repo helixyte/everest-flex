@@ -19,6 +19,7 @@ package org.everest.flex.model
         public var endNumber:int;
         public var totalResults:int;
         public var itemsPerPage:int;
+        public var selfLink:String;
 
         public function FeedInfo()
         {
