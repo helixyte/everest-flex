@@ -30,7 +30,7 @@ package org.everest.flex.model
          * @param ns the XML target name space (e.g. 'http://ns.example.com/cusstomer')
          * @param typePrefix the first part of the name of the resource entity (e.g. Customer not CustomerMember!)
          * @param modelClass reference to the ActionScript class presenting the ressource member
-         * @param schemaLocation the optional location of the xsd schema
+         * @param schemaLocation the optional location of the xsd schema (only needed if it has not been loaded before)
          * @param collectionClass  the optional class to be uesd for the collection (default is com.everest.model.MembersCollection)
          * @param linkClass thel optional class to be used for a link (default is com.everest.model.Link)
          *

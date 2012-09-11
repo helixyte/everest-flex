@@ -66,14 +66,6 @@ package org.everest.flex.model.managers
             _pageTitle = title;
         }
 
-//        public function loadConfiguration(everestConfigurationObject:*):void
-//        {
-////            var config:EverestConfiguration = EverestConfiguration.fromObject(everestConfigurationObject);
-//
-////            data.tags = xml..tags[0].toString();
-////            data.user = xml..user[0].toString();
-//        }
-
         public function initBrowserManager(browserManager:IBrowserManager):void
         {
             _browserManager = browserManager;
@@ -385,7 +377,7 @@ package org.everest.flex.model.managers
                 //load the menu module directly
                 loadModule(ContentType.APP_SERVICE,
                            fragment,
-                           "/public/com/cenix/louice/modules/menu/Menu.swf");
+                           _modules[ContentType.APP_SERVICE]);
             } else {
                 var newEvent:NavigationEvent =
                     new NavigationEvent(NavigationEvent.LOAD_PAGE);

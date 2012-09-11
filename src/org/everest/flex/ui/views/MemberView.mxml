@@ -191,7 +191,7 @@ The additionalContent section goes below and it not intended to be editable.
                 <s:SolidColor color="#FFFFFF" />
             </s:fill>
         </s:Rect>
-        <s:HGroup id="actionBar" top="-5" bottom="5" left="5" right="5">
+        <s:HGroup id="actionBar" top="-5" bottom="5" left="5" right="5" verticalAlign="middle">
             <s:Button id="editMember" label="Edit" 	   click="edit(event)" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>
             <!--<s:Button id="deleteMember" label="Delete" click="model.deleteMember()" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>-->
             <s:Button id="saveMember" label="Save"     click="{submit(model)}" includeIn="edit" chromeColor="#ccFFcc"/>
