@@ -19,6 +19,20 @@ package org.everest.flex.model
         {
         }
 
+        /**
+         * if the everest-flex application is delivered from a sub-directory path
+         * such as http://host:port:/staticUrlPrefix/everest-flex-app.swf then this
+         * function needs to return the whole directory structure to where the
+         * main application swf is placed. (default is '/public/')
+         *
+         * @return  sub-directory path where the application is placed. (default is '/public/')
+         *
+         */
+        public function get staticUrlPrefix():String
+        {
+            return '/public/';
+        }
+
         public function get schemaMappings():Vector.<SchemaModelEntry>
         {
             throw new Error('needs to be implemented in order to use everest');

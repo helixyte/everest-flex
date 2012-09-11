@@ -52,6 +52,7 @@ package org.everest.flex.model.managers
         private var _appUrl:URL;
         private var _modules:Dictionary;
         private var _schemaManager:SchemaManager;
+        private var _staticUrlPrefix:String = '';
 
         public function EverestShellManager(dispatcher:IEventDispatcher)
         {
@@ -273,6 +274,8 @@ package org.everest.flex.model.managers
 
             if (everestConfiguration != null)
             {
+                _staticUrlPrefix = everestConfiguration.staticUrlPrefix;
+
                 //load the schema mappings
                 var schemaLocations:Array = new Array();
 
@@ -376,8 +379,7 @@ package org.everest.flex.model.managers
             {
                 //load the menu module directly
                 loadModule(ContentType.APP_SERVICE,
-                           fragment,
-                           _modules[ContentType.APP_SERVICE]);
+                           fragment, getModuleUrl(ContentType.APP_SERVICE));
             } else {
                 var newEvent:NavigationEvent =
                     new NavigationEvent(NavigationEvent.LOAD_PAGE);
@@ -439,7 +441,7 @@ package org.everest.flex.model.managers
 
         private function getModuleUrl(type:String):String
         {
-            return "/public/"+ _modules[type];
+            return _staticUrlPrefix + _modules[type];
         }
 
     }
