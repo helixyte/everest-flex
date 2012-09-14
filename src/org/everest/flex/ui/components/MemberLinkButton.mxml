@@ -40,6 +40,7 @@ the link will be loaded by the everest flex framework.
                     var event:NavigationEvent = new NavigationEvent(NavigationEvent.LOAD_PAGE);
                     event.pageUrl = _link.href;
                     dispatchEvent(event);
+                    focusManager.deactivate();
                 }
             }
 
@@ -56,6 +57,7 @@ the link will be loaded by the everest flex framework.
                 var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
                     e.pageUrl = _link.href;
                 dispatchEvent(e);
+				focusManager.deactivate();
             }
 
             protected function createContextMenu():ContextMenu
