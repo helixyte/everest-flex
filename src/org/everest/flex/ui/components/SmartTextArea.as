@@ -28,7 +28,7 @@ package org.everest.flex.ui.components
 
         private const NEWLINE:String = "\n";
         private const CARRIAGE_RETURN:String = "\r";
-        private const SEPARATOR:String = ", ";
+        private const SEPARATOR:String = ",";
         private const RESIZE_FACTOR:Number = 1.3;
 
         private var _criteria:Criteria;
@@ -40,8 +40,10 @@ package org.everest.flex.ui.components
         public function SmartTextArea()
         {
             super();
-            addEventListener(TextOperationEvent.CHANGING, onTextChangingHandler);
-            addEventListener(TextOperationEvent.CHANGE, onTextChangedHandler);
+            addEventListener(TextOperationEvent.CHANGING, 
+                             onTextChangingHandler);
+            addEventListener(TextOperationEvent.CHANGE, 
+                             onTextChangedHandler);
 
             setStyle("verticalScrollPolicy", ScrollPolicy.AUTO);
             percentWidth = 100;
@@ -49,7 +51,8 @@ package org.everest.flex.ui.components
         }
 
         /**
-         * Allows to programmatically change the text and the associated criteria.
+         * Allows to programmatically change the text and the associated 
+         * criteria.
          *
          * @param value
          */
@@ -83,7 +86,8 @@ package org.everest.flex.ui.components
         private function getClipboardText():String
         {
             var txt:String = String(
-                Clipboard.generalClipboard.getData(ClipboardFormats.TEXT_FORMAT)
+                Clipboard.generalClipboard.getData(
+                                        ClipboardFormats.TEXT_FORMAT)
             );
             var delim:String;
             if (txt.indexOf(CARRIAGE_RETURN) != -1) {
@@ -111,7 +115,7 @@ package org.everest.flex.ui.components
 
         public function set criteria(crit:Criteria):void{
 
-            trace("crieria updated");
+            trace("criteria updated");
             this._criteria = crit;
 
             var criterion:Criterion = crit.get(name,_operator);
