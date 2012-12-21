@@ -2,7 +2,7 @@
 <!-- asdoc\SuggestionEventMap.mxml -->
 <!---
 Mate framework event handler definition for suggestion events. These are
-triggered by auto 'sugest' components such as a combo box.
+triggered by auto 'suggest' components such as a combo box.
 
 @see http://mate.asfusion.com/page/documentation/tags/eventmap
 -->
@@ -49,8 +49,11 @@ triggered by auto 'sugest' components such as a combo box.
         <EventHandlers type="{SuggestionEvent.LOAD_DATA}"
                        start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'SuggestionEvent.LOAD_DATA', dispatcher)"
                        end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'SuggestionEvent.LOAD_DATA', dispatcher)">
-            <utils:RestServiceInvoker url="{event.url}" resultFormat="e4x"
-                                method="GET">
+            <utils:RestServiceInvoker 
+                        url="{event.url}"
+                        resultFormat="e4x"
+                        method="GET"
+                        headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{manager}" method="loadData"

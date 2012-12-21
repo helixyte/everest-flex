@@ -9,26 +9,22 @@ a <code>model.submit</code> action.<br/>
 The additionalContent section goes below and it not intended to be editable.
 -->
 <s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
-         xmlns:s="library://ns.adobe.com/flex/spark"
-         xmlns:mx="library://ns.adobe.com/flex/mx"
-         xmlns:validators="org.everest.flex.ui.validators.*"
-         initialize="init();"
-         currentState="{model.viewState}"
-         verticalAlign="top"
-         enabled.pendingResponse="false" xmlns:BarCode="BarCode.*" >
-
+          xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:mx="library://ns.adobe.com/flex/mx"
+          xmlns:validators="org.everest.flex.ui.validators.*"
+          xmlns:BarCode="BarCode.*"
+          currentState="{model.viewState}" initialize="init();"
+          verticalAlign="top"
+          enabled.pendingResponse="false">
 
     <fx:Script>
         <![CDATA[
+            import mx.core.UIComponent;
+            
+            import spark.formatters.DateTimeFormatter;
+            
             import org.everest.flex.model.ResourceState;
             import org.everest.flex.ui.presenters.MemberPresentationModel;
-
-            import mx.controls.dataGridClasses.DataGridColumn;
-            import mx.core.UIComponent;
-            import mx.managers.BrowserManager;
-
-            import spark.components.gridClasses.GridColumn;
-            import spark.formatters.DateTimeFormatter;
 
             [ArrayElementType("mx.core.UIComponent")]
             public var content:Array;
@@ -147,56 +143,59 @@ The additionalContent section goes below and it not intended to be editable.
     </fx:Script>
     <fx:Declarations>
         <fx:Array id="validators"/>
-        <validators:FormValidator id="formValidator" validators="{validators}" />
+        <validators:FormValidator id="formValidator" validators="{validators}"/>
         <s:Sequence id="animation" repeatCount="0">
-            <s:AnimateColor colorPropertyName="chromeColor" colorFrom="{resetMember.getStyle('chromeColor')}" colorTo="#99ff00" duration="600"/>
-            <s:AnimateColor colorPropertyName="chromeColor" colorTo="{resetMember.getStyle('chromeColor')}" colorFrom="#99ff00" duration="600"/>
+            <s:AnimateColor colorFrom="{resetMember.getStyle('chromeColor')}"
+                            colorPropertyName="chromeColor" colorTo="#99ff00"
+                            duration="600"/>
+            <s:AnimateColor colorFrom="#99ff00" colorPropertyName="chromeColor"
+                            colorTo="{resetMember.getStyle('chromeColor')}"
+                            duration="600"/>
         </s:Sequence>
-        </fx:Declarations>
+    </fx:Declarations>
     <s:states>
-        <s:State name="pendingRequest" />
-        <s:State name="pendingResponse" />
-        <s:State name="edit" />
-        <s:State name="view" />
+        <s:State name="pendingRequest"/>
+        <s:State name="pendingResponse"/>
+        <s:State name="edit"/>
+        <s:State name="view"/>
     </s:states>
 
-    <s:Label id="labelElement" text="{title}" fontWeight="bold" fontSize="14" paddingTop="5" />
+    <s:Label id="labelElement" fontSize="14" fontWeight="bold" paddingTop="5"
+             text="{title}"/>
 
     <s:Group width="100%">
         <s:Rect width="100%" height="100%">
-            <s:fill><s:SolidColor color="0xFFFFFF" /></s:fill>
+            <s:fill><s:SolidColor color="0xFFFFFF"/></s:fill>
         </s:Rect>
 
-        <s:VGroup id="contentGroup" width="100%" excludeFrom="edit" itemCreationPolicy="immediate"
-                  paddingRight="5"
-                  paddingLeft="5"
-                  paddingBottom="5"/>
+        <s:VGroup id="contentGroup" excludeFrom="edit" width="100%"
+                  itemCreationPolicy="immediate" paddingBottom="5"
+                  paddingLeft="5" paddingRight="5"/>
 
-        <s:VGroup id="contentGroupEditable" width="100%" includeIn="edit"
-                  itemCreationPolicy="immediate"
-                  paddingRight="5"
-                  paddingLeft="5"
-                  paddingBottom="5"/>
+        <s:VGroup id="contentGroupEditable" includeIn="edit" width="100%"
+                  itemCreationPolicy="immediate" paddingBottom="5"
+                  paddingLeft="5" paddingRight="5"/>
     </s:Group>
     <s:Group visible="{editable || actionBarContent != null}">
-        <s:Rect top="-10"
-                bottom="0"
-                right="0"
-                left="0"
-                bottomLeftRadiusY="2"
-                bottomRightRadiusY="2"
-                bottomLeftRadiusX="2"
-                bottomRightRadiusX="2">
+        <s:Rect left="0" right="0" top="-10" bottom="0" bottomLeftRadiusX="2"
+                bottomLeftRadiusY="2" bottomRightRadiusX="2"
+                bottomRightRadiusY="2">
             <s:fill>
-                <s:SolidColor color="#FFFFFF" />
+                <s:SolidColor color="#FFFFFF"/>
             </s:fill>
         </s:Rect>
-        <s:HGroup id="actionBar" top="-5" bottom="5" left="5" right="5" verticalAlign="middle">
-            <s:Button id="editMember" label="Edit" 	   click="edit(event)" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>
+        <s:HGroup id="actionBar" left="5" right="5" top="-5" bottom="5"
+                  verticalAlign="middle">
+            <s:Button id="editMember" excludeFrom="edit" visible="{editable}"
+                      label="Edit" click="edit(event)"
+                      includeInLayout="{editable}"/>
             <!--<s:Button id="deleteMember" label="Delete" click="model.deleteMember()" excludeFrom="edit" visible="{editable}" includeInLayout="{editable}"/>-->
-            <s:Button id="saveMember" label="Save"     click="{submit(model)}" includeIn="edit" chromeColor="#ccFFcc"/>
-            <s:Button id="resetMember" label="Reset"   click="{reset(model)}" includeIn="edit" />
-            <s:HGroup id="actionBarContentGroup" includeInLayout="false" excludeFrom="edit" itemCreationPolicy="immediate"/>
+            <s:Button id="saveMember" includeIn="edit" label="Save"
+                      chromeColor="#ccFFcc" click="{submit(model)}"/>
+            <s:Button id="resetMember" includeIn="edit" label="Reset"
+                      click="{reset(model)}"/>
+            <s:HGroup id="actionBarContentGroup" excludeFrom="edit"
+                      includeInLayout="false" itemCreationPolicy="immediate"/>
         </s:HGroup>
     </s:Group>
 

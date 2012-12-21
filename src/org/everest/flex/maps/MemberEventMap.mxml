@@ -101,7 +101,8 @@ Mate framework event handler definition for all REST member views.
                        end="traceMessage(END_HANDLER_MSG, 'DocumentEvent.DOCUMENT_LOADED')">
             <StopHandlers stopFunction="stopDocumentLoadedHandler"
                           eventPropagation="noStop"/>
-            <MethodInvoker generator="{manager}" cache="local"
+            <MethodInvoker generator="{manager}" 
+                           cache="local"
                            method="loadEntry"
                            arguments="{event.document}" />
         </EventHandlers>
@@ -112,7 +113,8 @@ Mate framework event handler definition for all REST member views.
                        end="traceMessage(END_HANDLER_MSG, 'DocumentEvent.SUB_DOCUMENT_LOADED')">
          <!--   <StopHandlers stopFunction="stopSubDocumentLoadedHandler"
                           eventPropagation="noStop"/> -->
-            <MethodInvoker generator="{manager}" cache="local"
+            <MethodInvoker generator="{manager}" 
+                           cache="local"
                            method="loadSubEntry"
                            arguments="{event.document}" />
         </EventHandlers>
@@ -120,27 +122,37 @@ Mate framework event handler definition for all REST member views.
         <EventHandlers type="{MemberEvent.DELETE_MEMBER}"
                        start="traceMessage(START_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')"
                        end="traceMessage(END_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')">
-            <utils:RestServiceInvoker url="{event.member.selfLink}"
-                                resultFormat="text" contentType="text/plain"
-                                method="POST" request="{' '}"
-                                headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
+            <utils:RestServiceInvoker 
+                            url="{event.member.selfLink}"
+                            resultFormat="text"
+                            contentType="text/plain"
+                            method="POST"
+                            request="{' '}"
+                            headers="{{'X-HTTP-Method-Override': 'DELETE', 
+                                       'ACCEPT' : 'application/atom+xml'}}">
                 <utils:resultHandlers>
-                    <EventAnnouncer generator="{NavigationEvent}" bubbles="true"
+                    <EventAnnouncer generator="{NavigationEvent}" 
+                                    bubbles="true"
                                     type="{NavigationEvent.LOAD_HOME}" />
                 </utils:resultHandlers>
                 <utils:faultHandlers>
                     <InlineInvoker method="{CursorManager.removeBusyCursor}" />
                     <EventAnnouncer generator="{RestFaultEvent}"
                                     type="{RestFaultEvent.ERROR}">
-                        <Property targetKey="content" source="fault"
+                        <Property targetKey="content" 
+                                  source="fault"
                                   sourceKey="content"/>
-                        <Property targetKey="faultCode" source="fault"
+                        <Property targetKey="faultCode" 
+                                  source="fault"
                                   sourceKey="faultCode"/>
-                        <Property targetKey="faultDetail" source="fault"
+                        <Property targetKey="faultDetail" 
+                                  source="fault"
                                   sourceKey="faultDetail"/>
-                        <Property targetKey="faultString" source="fault"
+                        <Property targetKey="faultString" 
+                                  source="fault"
                                   sourceKey="faultString"/>
-                        <Property targetKey="location" source="fault"
+                        <Property targetKey="location" 
+                                  source="fault"
                                   sourceKey="location"/>
                     </EventAnnouncer>
                 </utils:faultHandlers>
@@ -151,10 +163,12 @@ Mate framework event handler definition for all REST member views.
         <Injectors target="{view}"
                    start="traceMessage(START_INJECTOR_MSG, view)"
                    end="traceMessage(END_INJECTOR_MSG, view)">
-            <ObjectBuilder generator="{manager}" cache="local" />
+            <ObjectBuilder generator="{manager}" 
+                           cache="local" />
             <ObjectBuilder generator="{presenter}"
                            constructorArguments="{scope.dispatcher}" />
-            <PropertyInjector targetKey="model" source="{lastReturn}" />
+            <PropertyInjector targetKey="model" 
+                              source="{lastReturn}" />
         </Injectors>
 
         <Injectors target="{presenter}"

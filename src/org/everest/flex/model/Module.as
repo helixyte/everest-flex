@@ -1,7 +1,7 @@
 package org.everest.flex.model
 {
     /**
-     * The presentation for each ressource (member and/or collection) is handled
+     * The presentation for each resource (member and/or collection) is handled
      * by a dedicated spark module (see flex documentation). This class defines
      * a mapping of a REST content type to a flex module.
      *

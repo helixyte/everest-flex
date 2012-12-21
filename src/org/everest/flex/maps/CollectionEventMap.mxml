@@ -114,10 +114,13 @@ Mate framework event handler definition for all REST collection views.
         <EventHandlers type="{MemberEvent.DELETE_MEMBER}"
                        start="traceMessage(START_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')"
                        end="traceMessage(END_HANDLER_MSG, 'MemberEvent.DELETE_MEMBER')">
-            <utils:RestServiceInvoker url="{event.member.selfLink}"
-                                resultFormat="text" contentType="text/plain"
-                                method="POST" request="{' '}"
-                                headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
+            <utils:RestServiceInvoker 
+                            url="{event.member.selfLink}"
+                            resultFormat="text" 
+                            contentType="text/plain"
+                            method="POST" 
+                            request="{' '}"
+                            headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{manager}" method="removeMember"

@@ -86,8 +86,12 @@ application.
             <MethodInvoker generator="{ShellPresentationModel}"
                            method="updateViewState"
                            arguments="{ResourceState.PENDING_RESPONSE}" />
-            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
-                                method="GET" contentType="application/zip">
+            <utils:RestServiceInvoker 
+                            url="{event.pageUrl}" 
+                            resultFormat="e4x"
+                            method="GET" 
+                            contentType="application/zip"
+                            headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadDocument"
@@ -108,8 +112,11 @@ application.
         <EventHandlers type="{NavigationEvent.LOAD_SUBORDINATE_PAGE}"
                        start="trace('* Start of NavigationEvent.LOAD_SUBORDINATE_PAGE handling!')"
                        end="trace('* End of NavigationEvent.LOAD_SUBORDINATE_PAGE handling!')">
-            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
-                                      method="GET">
+            <utils:RestServiceInvoker 
+                        url="{event.pageUrl}" 
+                        resultFormat="e4x"
+                        method="GET"
+                        headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadSubDocument"
@@ -136,9 +143,13 @@ application.
             <MethodInvoker generator="{EverestShellManager}"
                            method="getCurrentBaseUrl" />
 
-            <utils:RestServiceInvoker  url="{lastReturn}" resultFormat="e4x"
-                                contentType="application/vnd.xls"
-                                method="POST" request="{event.binaryData}">
+            <utils:RestServiceInvoker  
+                            url="{lastReturn}" 
+                            resultFormat="e4x"
+                            contentType="application/vnd.xls"
+                            method="POST" 
+                            request="{event.binaryData}"
+                            headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadDocument"
@@ -168,9 +179,12 @@ application.
             <MethodInvoker generator="{EverestShellManager}"
                            method="serializeMember"
                            arguments="{event.member}" />
-            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
-                          contentType="application/xml"
-                          method="POST" request="{lastReturn}">
+            <utils:RestServiceInvoker 
+                            url="{event.pageUrl}" resultFormat="e4x"
+                            contentType="application/xml"
+                            method="POST" 
+                            request="{lastReturn}"
+                            headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <!--<MethodInvoker
                         generator="{ShellManager}" method="loadDocument"
@@ -201,9 +215,13 @@ application.
             <MethodInvoker generator="{EverestShellManager}"
                            method="serializeMember"
                            arguments="{event.member}" />
-            <utils:RestServiceInvoker url="{event.pageUrl}" resultFormat="e4x"
-                                      contentType="application/xml"
-                                      method="POST" request="{lastReturn}">
+            <utils:RestServiceInvoker 
+                        url="{event.pageUrl}" 
+                        resultFormat="e4x"
+                        contentType="application/xml"
+                        method="POST"
+                        request="{lastReturn}"
+                        headers="{{'ACCEPT':'application/atom+xml'}}">
             </utils:RestServiceInvoker>
         </EventHandlers>
 
@@ -217,10 +235,13 @@ application.
             <MethodInvoker generator="{EverestShellManager}"
                            method="serializeMember"
                            arguments="{event.member}" />
-            <utils:RestServiceInvoker url="{event.member.selfLink}" resultFormat="e4x"
-                                contentType="application/xml"
-                                method="POST" request="{lastReturn}"
-                                headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+            <utils:RestServiceInvoker 
+                            url="{event.member.selfLink}" resultFormat="e4x"
+                            contentType="application/xml"
+                            method="POST"
+                            request="{lastReturn}"
+                            headers="{{'X-HTTP-Method-Override': 'PUT', 
+                                       'ACCEPT' : 'application/atom+xml'}}">
                 <utils:resultHandlers>
                    <MethodInvoker
                         generator="{EverestShellManager}" method="loadDocument"
@@ -243,10 +264,14 @@ application.
             <MethodInvoker generator="{EverestShellManager}"
                            method="serializeMember"
                            arguments="{event.member}" />
-            <utils:RestServiceInvoker url="{event.member.selfLink}" resultFormat="e4x"
-                                      contentType="application/xml"
-                                      method="POST" request="{lastReturn}"
-                                      headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+            <utils:RestServiceInvoker 
+                            url="{event.member.selfLink}" 
+                            resultFormat="e4x"
+                            contentType="application/xml"
+                            method="POST"
+                            request="{lastReturn}"
+                            headers="{{'X-HTTP-Method-Override': 'PUT', 
+                                       'ACCEPT' : 'application/atom+xml'}}">
             </utils:RestServiceInvoker>
         </EventHandlers>
 
@@ -257,10 +282,14 @@ application.
             <MethodInvoker generator="{ShellPresentationModel}"
                            method="updateViewState"
                            arguments="{ResourceState.PENDING_RESPONSE}" />
-            <utils:RestServiceInvoker  url="{event.member.selfLink}" resultFormat="e4x"
-                                       contentType="application/vnd.xls"
-                                       method="POST" request="{event.binaryData}"
-                                       headers="{{'X-HTTP-Method-Override': 'PUT'}}">
+            <utils:RestServiceInvoker  
+                            url="{event.member.selfLink}"
+                            resultFormat="e4x"
+                            contentType="application/vnd.xls"
+                            method="POST"
+                            request="{event.binaryData}"
+                            headers="{{'X-HTTP-Method-Override': 'PUT', 
+                                       'ACCEPT' : 'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadMember"

@@ -1,13 +1,7 @@
 package org.everest.flex.utils
 {
-    import org.everest.flex.interfaces.INavigationLink;
-    import org.everest.flex.model.Link;
-    import org.everest.flex.model.MembersCollection;
-
-    import mx.rpc.xml.ContentProxy;
     import mx.rpc.xml.DecodingContext;
     import mx.rpc.xml.XMLDecoder;
-    import mx.utils.ObjectUtil;
 
     /**
      *	Andy McIntosh - April 10, 2009

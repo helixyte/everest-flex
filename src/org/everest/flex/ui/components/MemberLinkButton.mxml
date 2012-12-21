@@ -11,14 +11,10 @@ the link will be loaded by the everest flex framework.
                click="linkClickHandler()" creationComplete="creationCompleteHandler(event)">
     <fx:Script>
         <![CDATA[
-            import flash.desktop.Clipboard;
-            import flash.desktop.ClipboardFormats;
-
             import mx.events.FlexEvent;
-
+            
             import org.everest.flex.events.NavigationEvent;
             import org.everest.flex.interfaces.INavigationLink;
-            import org.everest.flex.ui.presenters.MemberPresentationModel;
 
             [Bindable]
             private var _link:INavigationLink;

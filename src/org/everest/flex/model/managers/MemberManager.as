@@ -33,7 +33,7 @@ package org.everest.flex.model.managers
             }
             else
             {
-                ErrorView.show("Error while trying to load the ressource. Maybe it does not exist.");
+                ErrorView.show("Error while trying to load the resource. Maybe it does not exist.");
             }
 
         }
@@ -60,7 +60,7 @@ package org.everest.flex.model.managers
             }
             else
             {
-                ErrorView.show("Error while trying to load the ressource. Maybe it does not exist.");
+                ErrorView.show("Error while trying to load the resource. Maybe it does not exist.");
             }
 
         }

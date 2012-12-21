@@ -43,8 +43,11 @@ Mate framework event handler definition for subordinate REST requests.
         <EventHandlers type="{SubordinateEvent.LOAD_FEED}"
                        start="TraceUtils.traceMessage(TraceUtils.START_HANDLER_MSG, 'SubordinateEvent.LOAD_FEED', dispatcher)"
                        end="TraceUtils.traceMessage(TraceUtils.END_HANDLER_MSG, 'SubordinateEvent.LOAD_FEED', dispatcher)">
-            <utils:RestServiceInvoker url="{event.url}" resultFormat="e4x"
-                                method="GET">
+            <utils:RestServiceInvoker 
+                        url="{event.url}" 
+                        resultFormat="e4x"
+                        method="GET"
+                        headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{manager}" method="loadFeed"

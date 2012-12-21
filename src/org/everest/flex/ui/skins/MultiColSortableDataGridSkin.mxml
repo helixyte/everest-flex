@@ -7,14 +7,15 @@ renderer to put the custom header for allwing multiple column sorting.
 @see spark.skins.spark.DataGridSkin
 -->
 <spark:DataGridSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
-        xmlns:s="library://ns.adobe.com/flex/spark"
-        xmlns:spark="spark.skins.spark.*"
-        xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:renderers="org.everest.flex.ui.renderers.*">
+                    xmlns:s="library://ns.adobe.com/flex/spark"
+                    xmlns:spark="spark.skins.spark.*"
+                    xmlns:mx="library://ns.adobe.com/flex/mx"
+                    xmlns:renderers="org.everest.flex.ui.renderers.*">
     <fx:Declarations>
         <!--- Defines the value of the headerRenderer property for the columnHeaderGroup.
               The default is spark.skins.spark.DefaultGridHeaderRenderer -->
         <fx:Component id="headerRenderer">
-            <renderers:MultiColSortableGridHeaderRenderer xmlns:local="*" />
+            <renderers:MultiColSortableGridHeaderRenderer xmlns:local="*"/>
         </fx:Component>
     </fx:Declarations>
 </spark:DataGridSkin>

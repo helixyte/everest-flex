@@ -13,19 +13,17 @@ extend.
 -->
 <s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
           xmlns:s="library://ns.adobe.com/flex/spark"
-
           xmlns:mx="library://ns.adobe.com/flex/mx"
           xmlns:components="org.everest.flex.ui.components.*"
           width="100%" height="100%"
-          initialize="init();"
-          currentState="{model.viewState}"
-          creationComplete="creationCompleteHandler(event)" >
+          creationComplete="creationCompleteHandler(event)"
+          currentState="{model.viewState}" initialize="init();">
 
     <s:states>
-        <s:State name="normal" />
-        <s:State name="pendingRequest" />
-        <s:State name="pendingResponse" />
-        <s:State name="foldedFilterForm" />
+        <s:State name="normal"/>
+        <s:State name="pendingRequest"/>
+        <s:State name="pendingResponse"/>
+        <s:State name="foldedFilterForm"/>
     </s:states>
 
     <fx:Script>
@@ -220,89 +218,86 @@ extend.
     </fx:Script>
     <s:transitions>
         <mx:Transition fromState="*" toState="foldedFilterForm">
-            <s:Animate target="{filterFormContainer}" duration="80">
-                <s:SimpleMotionPath property="height" />
+            <s:Animate duration="80" target="{filterFormContainer}">
+                <s:SimpleMotionPath property="height"/>
             </s:Animate>
         </mx:Transition>
         <mx:Transition fromState="foldedFilterForm" toState="*">
-            <s:Animate target="{filterFormContainer}" duration="140" >
-                <s:SimpleMotionPath property="height" />
+            <s:Animate duration="140" target="{filterFormContainer}">
+                <s:SimpleMotionPath property="height"/>
             </s:Animate>
         </mx:Transition>
     </s:transitions>
 
-    <s:Label id="labelElement" text="{title}" fontWeight="bold" fontSize="14" paddingTop="4"  />
-    <s:Group width="100%" id="filterFormContainer" >
-        <s:Rect top="0" bottom="0" right="0" left="0"
-                radiusX="3" radiusY="3">
+    <s:Label id="labelElement" fontSize="14" fontWeight="bold" paddingTop="4"
+             text="{title}"/>
+    <s:Group id="filterFormContainer" width="100%">
+        <s:Rect left="0" right="0" top="0" bottom="0" radiusX="3" radiusY="3">
             <s:fill>
-                <s:SolidColor color="#FFFFFF" />
+                <s:SolidColor color="#FFFFFF"/>
             </s:fill>
         </s:Rect>
-        <s:Form id="filterForm" left="3" top="0" bottom="0" right="3"
-                excludeFrom="foldedFilterForm" itemCreationPolicy="immediate"/>
-        <components:ImageButton source="@Embed('../assets/fold_unfold.png')"
+        <s:Form id="filterForm" excludeFrom="foldedFilterForm" left="3" right="3"
+                top="0" bottom="0" itemCreationPolicy="immediate"/>
+        <components:ImageButton left="{width/2}" bottom="1"
                                 click="foldUnfoldButton_clickHandler(event)"
-                                bottom="1" left="{width/2}" toolTip="show or hide filter options"/>
+                                source="@Embed('../assets/fold_unfold.png')"
+                                toolTip="show or hide filter options"/>
     </s:Group>
     <s:VGroup width="100%" height="100%" gap="-1">
         <s:HGroup width="100%">
 
-            <components:Pager id="pager"
-                              model="{model}"
-                              title="{title}"
-                              width="100%" />
+            <components:Pager id="pager" width="100%" model="{model}"
+                              title="{title}"/>
 
-            <s:Group id="formActions" width="210"
-                     excludeFrom="foldedFilterForm" itemCreationPolicy="immediate">
-                <s:Rect top="-15" bottom="0" right="0" left="0"
-                        bottomLeftRadiusY="3"
-                        bottomRightRadiusY="3"
-                        bottomLeftRadiusX="3"
-                        bottomRightRadiusX="3">
+            <s:Group id="formActions" excludeFrom="foldedFilterForm" width="210"
+                     itemCreationPolicy="immediate">
+                <s:Rect left="0" right="0" top="-15" bottom="0"
+                        bottomLeftRadiusX="3" bottomLeftRadiusY="3"
+                        bottomRightRadiusX="3" bottomRightRadiusY="3">
                     <s:fill>
-                        <s:SolidColor color="#FFFFFF" />
+                        <s:SolidColor color="#FFFFFF"/>
                     </s:fill>
                 </s:Rect>
-                <s:Button id="resetButton" label="Reset"
-                          click="model.resetPage()"
-                          enabled.pendingResponse="false"
-                          width="100" left="3" top="-3" bottom="3"/>
-                <s:Button id="filterButton" label="{model.filterButtonLabel}"
+                <s:Button id="resetButton" left="3" top="-3" bottom="3"
+                          width="100" label="Reset" click="model.resetPage()"
+                          enabled.pendingResponse="false"/>
+                <s:Button id="filterButton" right="3" top="-3" bottom="3"
+                          width="100" label="{model.filterButtonLabel}"
                           click="filterButton_clickHandler(event)"
-                          enabled.pendingResponse="false"
                           fontWeight="bold"
-                          width="100" right="3" top="-3" bottom="3"/>
+                          enabled.pendingResponse="false"/>
             </s:Group>
 
         </s:HGroup>
 
-        <components:MemberDataGrid id="resultGrid"
-                                   selectionMode="multipleRows"
-                                   model="{model}"
-                                   borderColor="#999999" contentBackgroundColor="#FFFFFF">
+        <components:MemberDataGrid id="resultGrid" borderColor="#999999"
+                                   contentBackgroundColor="#FFFFFF"
+                                   model="{model}" selectionMode="multipleRows">
         </components:MemberDataGrid>
 
     </s:VGroup>
 
 
-    <s:HGroup verticalAlign="middle" width="100%">
+    <s:HGroup width="100%" verticalAlign="middle">
         <s:Button id="viewMember" label="View"
                   click="model.navigateToMember(resultGrid.selectedItem)"
                   enabled="{resultGrid.selectedItem != null}"/>
         <s:Button id="createMember" label="Create"
                   click="{showCreateMemberView(newMemberView)}"
                   enabled="{newMemberView != null}"/>
-        <s:Button id="deleteMember" label="Delete"
+        <s:Button id="deleteMember" visible="false" label="Delete"
                   click="model.deleteSelected()"
                   enabled="{resultGrid.selectedItem != null}"
-                  visible="false"
                   includeInLayout="false"/>
-        <components:CsvButton id="csv" label="CSV" model="{model}"
-                              visible="{showCsvButton}" includeInLayout="{showCsvButton}"/>
-        <s:Button id="print" label="Print" click="{resultGrid.printSelectedRows()}" enabled="{resultGrid.selectedItem != null}" />
+        <components:CsvButton id="csv" visible="{showCsvButton}" label="CSV"
+                              includeInLayout="{showCsvButton}" model="{model}"/>
+        <s:Button id="print" label="Print"
+                  click="{resultGrid.printSelectedRows()}"
+                  enabled="{resultGrid.selectedItem != null}"/>
         <s:Spacer width="100%"/>
-        <s:HGroup id="footerContentGroup" includeInLayout="false" verticalAlign="middle"/>
+        <s:HGroup id="footerContentGroup" includeInLayout="false"
+                  verticalAlign="middle"/>
     </s:HGroup>
 
 </s:VGroup>

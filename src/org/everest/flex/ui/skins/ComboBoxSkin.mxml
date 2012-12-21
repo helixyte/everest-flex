@@ -5,8 +5,10 @@ A light modification of the default ComboBoxSkin
 @see spark.components.ComboBox
 @see spark.skins.spark.ComboBoxSkin
 -->
-<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-        xmlns:fb="http://ns.adobe.com/flashbuilder/2009" alpha.disabled=".5">
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+             alpha.disabled=".5">
 
     <!-- host component -->
     <fx:Metadata>
@@ -24,7 +26,8 @@ A light modification of the default ComboBoxSkin
             private var cornerRadiusChanged:Boolean;
             private var cornerRadius:Number = 0;
 
-            /* Define the content fill items that should be colored by the "contentBackgroundColor" style. */
+            /* Define the content fill items that should be colored by the 
+               "contentBackgroundColor" style. */
             static private const contentFill:Array = ["bgFill"];
 
             /**
@@ -140,10 +143,10 @@ A light modification of the default ComboBoxSkin
     </fx:Script>
 
     <s:states>
-        <s:State name="normal" />
-        <s:State name="open" />
-        <s:State name="disabled" />
-        <s:State name="loading" />
+        <s:State name="normal"/>
+        <s:State name="open"/>
+        <s:State name="disabled"/>
+        <s:State name="loading"/>
     </s:states>
 
     <!---
@@ -152,9 +155,11 @@ A light modification of the default ComboBoxSkin
         <p>In a custom skin class that uses transitions, set the
         <code>itemDestructionPolicy</code> property to <code>none</code>.</p>
     -->
-    <s:PopUpAnchor id="popUp"  displayPopUp.normal="false" displayPopUp.open="true" includeIn="open"
-                   left="0" right="0" top="0" bottom="0" itemDestructionPolicy="auto"
-                   popUpPosition="below" popUpWidthMatchesAnchorWidth="true">
+    <s:PopUpAnchor id="popUp" includeIn="open" left="0" right="0" top="0"
+                   bottom="0" itemDestructionPolicy="auto" popUpPosition="below"
+                   popUpWidthMatchesAnchorWidth="true"
+                   displayPopUp.normal="false"
+                   displayPopUp.open="true">
 
         <!---
             This includes borders, background colors, scrollers, and filters.
@@ -164,8 +169,10 @@ A light modification of the default ComboBoxSkin
 
             <!-- drop shadow -->
             <!--- @private -->
-            <s:RectangularDropShadow id="dropShadow" blurX="20" blurY="20" alpha="0.45" distance="7"
-                                     angle="90" color="#000000" left="0" top="0" right="0" bottom="0"/>
+            <s:RectangularDropShadow id="dropShadow" left="0" right="0" top="0"
+                                     bottom="0" alpha="0.45" angle="90"
+                                     blurX="20" blurY="20" color="#000000"
+                                     distance="7"/>
 
             <!-- border -->
             <!--- @private -->
@@ -178,23 +185,28 @@ A light modification of the default ComboBoxSkin
 
             <!-- fill -->
             <!--- Defines the appearance of drop-down list's background fill. -->
-            <s:Rect id="background" left="1" right="1" top="1" bottom="1" >
+            <s:Rect id="background" left="1" right="1" top="1" bottom="1">
                 <s:fill>
                     <!---
                         @private
                         The color of the drop down's background fill.
                         The default color is 0xFFFFFF.
                     -->
-                    <s:SolidColor id="bgFill" color="0xFFFFFF" />
+                    <s:SolidColor id="bgFill" color="0xFFFFFF"/>
                 </s:fill>
             </s:Rect>
 
             <!--- @private -->
-            <s:Scroller id="scroller" left="0" top="0" right="0" bottom="0" hasFocusableChildren="false" minViewportInset="1">
+            <s:Scroller id="scroller" left="0" right="0" top="0" bottom="0"
+                        hasFocusableChildren="false" minViewportInset="1">
                 <!--- @copy spark.components.SkinnableDataContainer#dataGroup-->
-                <s:DataGroup id="dataGroup" itemRenderer="spark.skins.spark.DefaultItemRenderer">
+                <s:DataGroup id="dataGroup"
+                             itemRenderer="spark.skins.spark.DefaultItemRenderer">
                     <s:layout>
-                        <s:VerticalLayout gap="0" horizontalAlign="contentJustify" requestedMinRowCount="1" requestedMaxRowCount="6"/>
+                        <s:VerticalLayout gap="0"
+                                          horizontalAlign="contentJustify"
+                                          requestedMaxRowCount="6"
+                                          requestedMinRowCount="1"/>
                     </s:layout>
                 </s:DataGroup>
             </s:Scroller>
@@ -204,14 +216,17 @@ A light modification of the default ComboBoxSkin
     <!---  The default skin is ComboBoxButtonSkin.
             @copy spark.components.supportClasses.DropDownListBase#openButton
             @see spark.skins.spark.ComboBoxButtonSkin -->
-    <s:Button id="openButton" width="19" right="0" top="0" bottom="0" focusEnabled="false"
-              skinClass="spark.skins.spark.ComboBoxButtonSkin" tabEnabled="false" />
+    <s:Button id="openButton" right="0" top="0" bottom="0" width="19"
+              focusEnabled="false"
+              skinClass="spark.skins.spark.ComboBoxButtonSkin"
+              tabEnabled="false"/>
     <!--- @copy spark.components.ComboBox#textInput -->
-    <s:TextInput id="textInput" enabled.disabled="false"
-                 left="0" right="18" top="0" bottom="0"
-                 skinClass="spark.skins.spark.ComboBoxTextInputSkin"/>
+    <s:TextInput id="textInput" left="0" right="18" top="0" bottom="0"
+                 skinClass="spark.skins.spark.ComboBoxTextInputSkin"
+                 enabled.disabled="false"/>
     <!-- wait spinner -->
-    <s:BusyIndicator width="12" height="10"  left="1" top="1" bottom="1" includeIn="disabled"/>
+    <s:BusyIndicator includeIn="disabled" left="1" top="1" bottom="1" width="12"
+                     height="10"/>
 
 
 </s:SparkSkin>

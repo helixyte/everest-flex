@@ -2,7 +2,7 @@ package org.everest.flex.interfaces
 {
     [Bindable]
     /**
-     * Holds the url reference to a REST ressource and a descriptive title.
+     * Holds the url reference to a REST resource and a descriptive title.
      *
      * @author rothe
      */
