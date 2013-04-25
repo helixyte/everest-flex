@@ -76,6 +76,12 @@ package org.everest.flex.ui.components
             return this._criteria;
         }
 
+		public function set textValue(value:String):void
+		{
+			super.text = value;
+			changeHandler(null);
+		}
+		
         protected function changeHandler(event:TextOperationEvent):void
         {
             if(text.length == 0){
