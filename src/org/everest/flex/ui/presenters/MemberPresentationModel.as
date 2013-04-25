@@ -5,11 +5,11 @@ package org.everest.flex.ui.presenters
     import flash.events.IEventDispatcher;
     import flash.utils.ByteArray;
     import flash.utils.Timer;
-
+    
     import mx.controls.Alert;
     import mx.events.CloseEvent;
     import mx.managers.BrowserManager;
-
+    
     import org.everest.flex.events.MemberEvent;
     import org.everest.flex.events.NavigationEvent;
     import org.everest.flex.model.Member;
@@ -151,15 +151,17 @@ package org.everest.flex.ui.presenters
             dispatcher.dispatchEvent(event);
         }
 
-        public function updateMemberFromXls(fileData:ByteArray):void
+        public function updateMemberFromData(data:ByteArray, contentType:String, responseContentType:String=null):void
         {
-            trace("- Update Member using an Excel sheet.\n");
+            trace("- Update Member using binary data of a given conten type.\n");
 
-            var event:MemberEvent = new MemberEvent(MemberEvent.UPDATE_MEMBER_FROM_XLS);
-            event.binaryData = fileData;
+            var event:MemberEvent = new MemberEvent(MemberEvent.UPDATE_MEMBER_FROM_DATA);
+            event.binaryData = data;
+			event.contentType = contentType;
+			event.responseContentType = responseContentType;
             event.member = _member;
 
-            dispatcher.dispatchEvent(event);
+			dispatcher.dispatchEvent(event);
         }
 
         /**

@@ -138,22 +138,38 @@ package org.everest.flex.utils
         }
 
         /*-.........................................contentType..........................................*/
-        private var _contentType:String;
+        private var _contentType:Object;
         /**
          * Type of content for service requests. The default is <code>application/x-www-form-urlencoded</code> which sends requests like a normal HTTP POST with name-value pairs.
          * <code>application/xml</code> send requests as XML.
          */
-        public function get contentType():String
+        public function get contentType():Object
         {
             return _contentType;
         }
 
-        public function set contentType(value:String):void
+        public function set contentType(value:Object):void
         {
             _contentType = value;
         }
 
 
+		/*-.........................................responseContentType..........................................*/
+		private var _responseContentType:Object;
+		/**
+		 * Type of content for the service request response. This is put in an ACCEPT header.
+		 */
+		public function get responseContentType():Object
+		{
+			return _responseContentType;
+		}
+		
+		public function set responseContentType(value:Object):void
+		{
+			_responseContentType = value;
+		}
+		
+		
         /*-.........................................headers..........................................*/
         private var _headers:Object;
         /**
@@ -271,9 +287,20 @@ package org.everest.flex.utils
             }
 
             if(channelSet)				httpInstance.channelSet = channelSet;
-            if(contentType)				httpInstance.contentType = contentType;
+            if(contentType)
+			{
+				httpInstance.contentType = (contentType is ISmartObject) 
+					? ISmartObject(contentType).getValue(scope).toString() 
+					: contentType.toString();	
+			}
             if(destination) 			httpInstance.destination = destination;
-            if(headers) 				httpInstance.headers = headers;
+            if(headers)					httpInstance.headers = headers;
+			if(responseContentType)
+			{
+				httpInstance.headers['ACCEPT'] = (responseContentType is ISmartObject) 
+					? ISmartObject(responseContentType).getValue(scope).toString() 
+					: responseContentType.toString();
+			}
             if(requestTimeoutChanged)	httpInstance.requestTimeout = requestTimeout
             if(resultFormat) 			httpInstance.resultFormat = resultFormat;
             if(rootURL)					httpInstance.rootURL = rootURL;

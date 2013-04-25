@@ -1,9 +1,9 @@
 package org.everest.flex.events
 {
-    import org.everest.flex.model.Member;
-
     import flash.events.Event;
     import flash.utils.ByteArray;
+    
+    import org.everest.flex.model.Member;
 
     /**
      * Events for REST collection members.
@@ -18,19 +18,43 @@ package org.everest.flex.events
         public static const CREATE_MEMBER_IN_BACKGROUND:String = "createMemberBackgroundEvent";
         public static const EDIT_MEMBER:String = "editMemberEvent";
         public static const EDIT_MEMBER_IN_BACKGROUND:String = "editMemberBackgroundEvent";
-        public static const CREATE_MEMBER_FROM_XLS:String = "createMemberFromXlsEvent";
-        public static const UPDATE_MEMBER_FROM_XLS:String = "updateMemberFromXlsEvent";
+        public static const CREATE_MEMBER_FROM_DATA:String = "createMemberFromDataEvent";
+        public static const UPDATE_MEMBER_FROM_DATA:String = "updateMemberFromDataEvent";
 
         public var binaryData : ByteArray;
-        public var member : Member;
+		public var member : Member;
+
+		private var _contentType : String;
+		private var _responseContentType : String;
         private var _pageUrl : String;
+		private var _headers : Object;
 
         public function MemberEvent(type:String, bubbles:Boolean=true,
-                                    ancelable:Boolean=false)
+                                    cancelable:Boolean=false)
         {
             super(type, bubbles, cancelable);
         }
+		
+		public function set contentType(contentType:String): void
+		{
+			_contentType = contentType;
+		}
+		
+		public function get contentType(): String
+		{
+			return _contentType;
+		}
 
+		public function set responseContentType(responseContentType:String): void
+		{
+			_responseContentType = responseContentType;
+		}
+		
+		public function get responseContentType(): String
+		{
+			return _responseContentType;
+		}
+		
         public function set pageUrl(url:String):void
         {
             //url shall not be overriden
@@ -44,5 +68,7 @@ package org.everest.flex.events
         {
             return _pageUrl;
         }
-    }
+
+	
+	}
 }

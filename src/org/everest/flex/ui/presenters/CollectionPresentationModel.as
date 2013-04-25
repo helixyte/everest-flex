@@ -1,7 +1,7 @@
 package org.everest.flex.ui.presenters
 {
     import com.adobe.utils.StringUtil;
-
+    
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IEventDispatcher;
@@ -12,13 +12,15 @@ package org.everest.flex.ui.presenters
     import flash.utils.Dictionary;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-
+    
     import mx.collections.ArrayCollection;
     import mx.collections.Sort;
     import mx.controls.Alert;
     import mx.events.CloseEvent;
     import mx.managers.BrowserManager;
-
+    
+    import spark.collections.SortField;
+    
     import org.everest.flex.events.CollectionEvent;
     import org.everest.flex.events.MemberEvent;
     import org.everest.flex.events.NavigationEvent;
@@ -29,8 +31,6 @@ package org.everest.flex.ui.presenters
     import org.everest.flex.query.QueryParser;
     import org.everest.flex.ui.components.ConfirmationView;
     import org.everest.flex.ui.components.ErrorView;
-
-    import spark.collections.SortField;
 
     /**
      * Contains the presentation logic and data for the REST collection view.
@@ -181,12 +181,24 @@ package org.everest.flex.ui.presenters
             dispatcher.dispatchEvent(event);
         }
 
-        public function createMemberFromXls(fileData:ByteArray):void
+        public function createMemberFromData(fileData:ByteArray, 
+											 contentType:String, 
+		                                     url:String = null,
+											 responseContentType:String = null):void
         {
-            trace("- Create Member using an Excel sheet.\n");
+            trace("- Create Member using binary data of a given content type.\n");
 
-            var event:MemberEvent = new MemberEvent(MemberEvent.CREATE_MEMBER_FROM_XLS);
-                event.binaryData = fileData;
+            var event:MemberEvent = new MemberEvent(MemberEvent.CREATE_MEMBER_FROM_DATA);
+            event.binaryData = fileData;
+			event.contentType = contentType;
+			if (url != null)
+			{
+				event.pageUrl = url;
+			}
+			if (responseContentType != null)
+			{
+				event.responseContentType = responseContentType;
+			}
 
             dispatcher.dispatchEvent(event);
         }

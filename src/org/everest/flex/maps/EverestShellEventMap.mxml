@@ -133,9 +133,9 @@ application.
         </EventHandlers>
 
 
-        <EventHandlers type="{MemberEvent.CREATE_MEMBER_FROM_XLS}"
-                       start="trace('* Start of MemberEvent.CREATE_MEMBER_FROM_XLS handling!')"
-                       end="trace('* End of MemberEvent.CREATE_MEMBER_FROM_XLS handling!')">
+        <EventHandlers type="{MemberEvent.CREATE_MEMBER_FROM_DATA}"
+                       start="trace('* Start of MemberEvent.CREATE_MEMBER_FROM_DATA handling!')"
+                       end="trace('* End of MemberEvent.CREATE_MEMBER_FROM_DATA handling!')">
             <InlineInvoker method="{CursorManager.setBusyCursor}" />
             <MethodInvoker generator="{ShellPresentationModel}"
                            method="updateViewState"
@@ -144,14 +144,20 @@ application.
                            method="getCurrentBaseUrl" />
 
             <utils:RestServiceInvoker  
-                            url="{lastReturn}" 
+                            url="{event.pageUrl == null ? lastReturn : event.pageUrl}" 
                             resultFormat="e4x"
-                            contentType="application/vnd.xls"
+                            contentType="{event.contentType}"
+							responseContentType="{event.responseContentType}"
                             method="POST" 
-                            request="{event.binaryData}"
-                            headers="{{'ACCEPT':'application/atom+xml'}}">
+                            request="{event.binaryData}">
                 <utils:resultHandlers>
-                    <MethodInvoker
+					<InlineInvoker method="{CursorManager.removeBusyCursor}" />
+					<MethodInvoker
+						generator="{EverestShellManager}" method="hasViewForDocument"
+						arguments="{resultObject}" />
+					<StopHandlers lastReturnEquals="{false}" />
+					<InlineInvoker method="{CursorManager.setBusyCursor}" />
+					<MethodInvoker
                         generator="{EverestShellManager}" method="loadDocument"
                         arguments="{[event.pageUrl, resultObject]}" />
                     <InlineInvoker method="{CursorManager.removeBusyCursor}" />
@@ -275,9 +281,9 @@ application.
             </utils:RestServiceInvoker>
         </EventHandlers>
 
-        <EventHandlers type="{MemberEvent.UPDATE_MEMBER_FROM_XLS}"
-                       start="trace('* Start of MemberEvent.UPDATE_MEMBER_FROM_XLS handling!')"
-                       end="trace('* End of MemberEvent.UPDATE_MEMBER_FROM_XLS handling!')">
+        <EventHandlers type="{MemberEvent.UPDATE_MEMBER_FROM_DATA}"
+                       start="trace('* Start of MemberEvent.UPDATE_MEMBER_FROM_DATA handling!')"
+                       end="trace('* End of MemberEvent.UPDATE_MEMBER_FROM_DATA handling!')">
             <InlineInvoker method="{CursorManager.setBusyCursor}" />
             <MethodInvoker generator="{ShellPresentationModel}"
                            method="updateViewState"
@@ -285,11 +291,11 @@ application.
             <utils:RestServiceInvoker  
                             url="{event.member.selfLink}"
                             resultFormat="e4x"
-                            contentType="application/vnd.xls"
+                            contentType="{event.contentType}"
+							responseContentType="{event.responseContentType}"
                             method="POST"
                             request="{event.binaryData}"
-                            headers="{{'X-HTTP-Method-Override': 'PUT', 
-                                       'ACCEPT' : 'application/atom+xml'}}">
+                            headers="{{'X-HTTP-Method-Override':'PUT'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadMember"

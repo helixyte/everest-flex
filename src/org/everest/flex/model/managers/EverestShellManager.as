@@ -7,13 +7,13 @@ package org.everest.flex.model.managers
     import flash.net.navigateToURL;
     import flash.utils.Dictionary;
     import flash.utils.Timer;
-
+    
     import mx.collections.ArrayCollection;
     import mx.core.FlexGlobals;
     import mx.events.BrowserChangeEvent;
     import mx.managers.CursorManager;
     import mx.managers.IBrowserManager;
-
+    
     import org.as3commons.lang.StringUtils;
     import org.everest.flex.events.DocumentEvent;
     import org.everest.flex.events.NavigationEvent;
@@ -176,6 +176,26 @@ package org.everest.flex.model.managers
             dispatchEvent(new DocumentEvent(DocumentEvent.SUB_DOCUMENT_CHANGED));
             CursorManager.removeBusyCursor();
         }
+		
+		public function hasViewForDocument(doc:XML):Boolean
+		{
+			use namespace atom;
+			var result:Boolean;
+			var type:String;
+			switch (doc.localName()) {
+				case "service":
+					result = true;
+					break;				
+				case "feed":
+					type = doc.atom::content_type.@name;
+					result = type in _modules;
+					break;				
+				case "entry":
+					type = doc.atom::content.@type;
+					result = type in _modules;
+			}
+			return result;
+		}
 
         public function loadDocument(pageUrl:String, doc:XML):void
         {
