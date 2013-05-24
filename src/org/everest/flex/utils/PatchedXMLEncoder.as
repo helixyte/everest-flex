@@ -35,12 +35,88 @@ package org.everest.flex.utils
         }
 
         /**
+         * choice:
+         *    (annotation?, (element | group | choice | sequence | any)*)
+         * 
+         * @private
+         */
+        public override function encodeChoice(definition:XML, parent:XMLList, name:QName, value:*, isRequired:Boolean = true):Boolean
+        {
+            var maxOccurs:uint = getMaxOccurs(definition);
+            var minOccurs:uint = getMinOccurs(definition);
+            
+            // If maxOccurs is 0 this choice must not be present.
+            // If minOccurs == 0 the choice is optional so it can be omitted if
+            // a value was not provided.
+            if (maxOccurs == 0)
+                return false;
+            if (value == null && minOccurs == 0)
+                return true;
+            
+            var choiceElements:XMLList = definition.elements();
+            var choiceSatisfied:Boolean = true;
+            
+            // We don't enforce occurs bounds on the choice element itself. Since all
+            // child elements of the choice definition would be properties on the
+            // value object, simply looping through the choice children once would
+            // encode the values that apply to each of the child elements.
+
+            // An empty choice is satisfied by default, but if there are choiceElements
+            // we need to start out with choiceSatisfied = false
+            if (choiceElements.length() > 0)
+                choiceSatisfied = false;
+            
+            for each (var childDefinition:XML in choiceElements)
+            {
+                if (childDefinition.name() == constants.elementTypeQName)
+                {
+                    // <element>
+                    choiceSatisfied = encodeGroupElement(childDefinition, parent,
+                        name, value, false);
+                }
+                else if (childDefinition.name() == constants.sequenceQName)
+                {
+                    // <sequence>
+                    choiceSatisfied = encodeSequence(childDefinition, parent,
+                        name, value, false);
+                }
+                else if (childDefinition.name() == constants.groupQName)
+                {
+                    // <group>
+                    choiceSatisfied = encodeGroupReference(childDefinition, parent,
+                        name, value, false);
+                }
+                else if (childDefinition.name() == constants.choiceQName)
+                {
+                    // <choice>
+                    choiceSatisfied = encodeChoice(childDefinition, parent,
+                        name, value, false);
+                }
+                else if (childDefinition.name() == constants.anyQName)
+                {
+                    // <any>
+                    choiceSatisfied = encodeAnyElement(childDefinition, parent,
+                        name, value, false);
+                }
+                
+                // Patch to stop encoding more attributes after the choice 
+                // has been satisfied with at least minOccurs number of elements.
+                if (choiceSatisfied && parent.length() >= minOccurs)
+                {
+                    return choiceSatisfied;
+                }
+            }
+            
+            return choiceSatisfied;
+        }
+        
+        /**
          * complexContent:
          *   restriction:
          *     (annotation?, (group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?), (assert | report)*)
          *
          * @private
-         */
+         */ 
         public override function encodeComplexRestriction(restriction:XML, parent:XML, name:QName, value:*):void
         {
             var baseName:String = getAttributeFromNode("base", restriction);

@@ -14,9 +14,10 @@ package org.everest.flex.model
         public static const MEMBER:String="MEMBER";
         public static const COLLECTION:String="COLLECTION";
 
+		public var rel:String;
+		public var length:uint;
         private var _href:String;
         private var _title:String;
-        public var rel:String;
         private var _kind:String;
 
         public function Link(title:String=null, url:String=null, kind:String=MEMBER)
