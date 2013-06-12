@@ -38,15 +38,14 @@ package org.everest.flex.events
                     msg = String(html.body.text()).replace("\n", "");
                 }
                 catch (e:TypeError) {
-                    msg = "Check server log for the error message or the debug URL";
+                    msg = "Check server log for the error message or the debug URL.";
                 }
 
             } else if((fault != null) && (fault.faultString != null)&&(fault.faultString.length > 0)){
                 msg += fault.faultString;
 
             } else {
-                msg = "An internal server error has occured (500). " +
-                      "A message has been sent to the T&L development team.";
+                msg = "An internal server error has occured (500).";
             }
             return msg;
         }

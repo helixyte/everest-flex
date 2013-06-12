@@ -77,6 +77,9 @@ package org.everest.flex.ui.presenters
                         {
                             var e:MemberEvent = new MemberEvent(cause.type);
                             e.binaryData = MemberEvent(cause).binaryData;
+                            e.contentType = MemberEvent(cause).contentType;
+                            e.responseContentType = MemberEvent(cause).responseContentType;
+                            e.pageUrl = MemberEvent(cause).pageUrl;
                             e.member = MemberEvent(cause).member;
                             e.member.selfLink = event.fault.location;
                             _dispatcher.dispatchEvent(e);
