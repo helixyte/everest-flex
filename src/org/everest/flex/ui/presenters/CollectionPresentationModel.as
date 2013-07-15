@@ -66,6 +66,10 @@ package org.everest.flex.ui.presenters
             {label:"500", data:500},
             {label:"1000", data:1000}
         ]);
+        
+        // This is the maximum number of results to return when using the CSV
+        // export button.
+        public static const CSV_MAX_PAGE_SIZE:uint = 100000;
 
         /**
          * When sorting by nested members the server requires the sort criteria
@@ -116,14 +120,19 @@ package org.everest.flex.ui.presenters
             resetRequestStartTime();
             _timer.addEventListener(TimerEvent.TIMER, calcTotalRequestTime);
         }
-
-        public function filterCollection():void
+        
+        public function get filterUrl() : String
         {
             // FIXME: just a quick hack - create the final URL using another object.
             var params:Array = prepareRequestParams();
             var url:String = _generatorUri + "?" + params.join("&");
-            trace("- Filter URL: " + url);
-            gotoPage(url);
+            return url
+        }
+
+        public function filterCollection():void
+        {
+            trace("- Filter URL: " + filterUrl);
+            gotoPage(filterUrl);
         }
 
         public function changePageSize(pageSize:Object):void
@@ -140,26 +149,43 @@ package org.everest.flex.ui.presenters
             navigateToLink(url);
         }
 
-        public function downloadCSV():void{
-
+        public function downloadCSV():void
+        {
             navigateToURL(new URLRequest(csvLink));
-
         }
 
-        public function get csvLink():String{
-            var params:Array = prepareRequestParams();
-
-            var arr:Array = _selfLink.split('/?');
-            if (arr.length < 2)
+        public function get csvLink():String
+        {
+            var qIndex:int = _selfLink.indexOf('?');
+            var collectionUrl:String = '';
+            if (_selfLink.charAt(qIndex - 1) == '/')
+                collectionUrl += _selfLink.substr(0, qIndex-1)
+            else
+                collectionUrl += _selfLink.substr(0, qIndex);
+            // Remove the "size" and "start" parameters.
+            var params:Array = _selfLink.substr(qIndex, _selfLink.length).split('&');
+            var newParams:Array = new Array();
+            newParams.push(params[0]);
+            for (var pIdx:int = 1;pIdx < params.length;pIdx++)
             {
-                arr = _selfLink.split('?');
+                var param:String = params[pIdx];
+                if (param.substring(0, 4) != 'size' &&
+                    param.substring(0, 5) != 'start')
+                    newParams.push(param);
             }
+            return collectionUrl + ".csv" + newParams.join('&') + '&size=' + CSV_MAX_PAGE_SIZE; 
 
+//            var arr:Array = _selfLink.split('/?');
+//            if (arr.length < 2)
+//            {
+//                arr = _selfLink.split('?');
+//            }
+                
+//            var params:Array = prepareRequestParams();
 //            var url:String = _selfLink.substr(_selfLink.length - 1) == "/" ? _selfLink.substr(0, _selfLink.length - 1) : _selfLink;
-//            url +=  ".csv/?" + params.join("&");
-
-            return arr.join(".csv?");
-
+//            return url + ".csv/?" + params.join("&");
+//
+//            return arr.join(".csv?");
         }
 
         public function deleteSelected():void

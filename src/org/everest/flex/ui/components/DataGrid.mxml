@@ -16,18 +16,22 @@ select, copy or print rows.
     <fx:Script>
         <![CDATA[
             import com.adobe.utils.StringUtil;
+            
             import flash.desktop.Clipboard;
             import flash.desktop.ClipboardFormats;
-
+            
             import mx.collections.ArrayCollection;
             import mx.collections.IList;
-
-            import org.everest.flex.ui.components.print.PrintPreView;
-
+            
             import spark.components.gridClasses.GridColumn;
+            
+            import org.everest.flex.events.NavigationEvent;
+            import org.everest.flex.ui.components.print.PrintPreView;
 
             [Bindable]
             public var enableCopy : Boolean = true;
+            
+            private var _customContextMenuItemInfos:Dictionary = new Dictionary();
 
             protected function creationCompleteHandler(event:Event):void
             {
@@ -36,7 +40,7 @@ select, copy or print rows.
 
             protected function createContextMenu():ContextMenu
             {
-                var copyItem:ContextMenuItem = new ContextMenuItem("Copy selected rows", false);
+                var copyItem:ContextMenuItem = new ContextMenuItem("Copy selected rows", true);
                     copyItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, copyHandler);
 
                 var printItem:ContextMenuItem = new ContextMenuItem("Print selected rows", false);
@@ -61,11 +65,48 @@ select, copy or print rows.
                     {
                         dbDp.addItem(row);
                     }
-
                     PrintPreView.show(this, columns, dbDp );
                 }
-
             }
+            
+            public function addFollowLinkWithSelectedContextMenu(caption:String, url:String,
+                                                                 dataField:String="id",
+                                                                 insertAtFront:Boolean=true, 
+                                                                 separatorBefore:Boolean=true):void
+            {
+                var ctxtMenuItem:ContextMenuItem =
+                    new ContextMenuItem(caption, separatorBefore);
+                if (insertAtFront)
+                    contextMenu.customItems.unshift(ctxtMenuItem);
+                else
+                    contextMenu.customItems.push(ctxtMenuItem);
+                ctxtMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,
+                                              followLinkContextMenu_selectHandler);
+                var info:Object = new Object();
+                info['url'] = url;
+                info['dataField'] = dataField;
+                _customContextMenuItemInfos[caption] = info;
+            }
+            
+            protected function followLinkContextMenu_selectHandler(event:Event):void
+            {
+                if (selectedItems != null)
+                {
+                    var info:Object = _customContextMenuItemInfos[event.target.caption];
+                    var ids:Vector.<String> = new Vector.<String>; 
+                    for each (var row:* in selectedItems)
+                    {
+                        var acc:String = row[info.dataField];
+                        ids.push(acc);
+                    }
+                    var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
+                    var pageUrl:String = info.url + '"' + ids.join('","') + '"'; 
+                    trace("- Following URL with selected items: " + pageUrl);
+                    e.pageUrl = pageUrl;
+                    dispatchEvent(e);
+                }                
+            }
+            
             protected function selectAllFromMenu(event:Event):void{
                 this.setFocus();
                 this.selectAll();
