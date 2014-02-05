@@ -1,7 +1,5 @@
 package org.everest.flex.model
 {
-    import mx.states.State;
-
     /**
      * Ressource state is used for the everest client shell view.
      *

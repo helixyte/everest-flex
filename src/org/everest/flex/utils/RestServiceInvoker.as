@@ -8,10 +8,10 @@ package org.everest.flex.utils
     import com.asfusion.mate.core.ISmartObject;
     import com.asfusion.mate.core.Properties;
     import com.asfusion.mate.events.UnhandledFaultEvent;
-
+    
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
-
+    
     import mx.rpc.AsyncToken;
     import mx.rpc.Fault;
     import mx.rpc.Responder;
@@ -82,7 +82,7 @@ package org.everest.flex.utils
         /*-.........................................method..........................................*/
         private var _method:Object;
         /**
-         * HTTP method for sending the request. Permitted values are GET, POST, HEAD, OPTIONS, PUT, TRACE and DELETE.
+         * HTTP method for sending the request. Permitted values are GET, POST, PATCH, HEAD, OPTIONS, PUT, TRACE and DELETE.
          * Lowercase letters are converted to uppercase letters. The default value is GET.
          */
         override public function get method():Object
@@ -90,8 +90,8 @@ package org.everest.flex.utils
             return _method;
         }
 
-        [Inspectable(enumeration="GET,POST,HEAD,OPTIONS,PUT,TRACE,DELETE")]
-        override public function set method( value:Object ):void
+        [Inspectable(enumeration="GET,POST,PATCH,HEAD,OPTIONS,PUT,TRACE,DELETE")]
+        override public function set method(value:Object):void
         {
             _method = value;
         }
@@ -281,7 +281,7 @@ package org.everest.flex.utils
                 else
                 {
                     var realRequest:Object = new Object();
-                    realRequest = Properties.smartCopy( smartRequest, realRequest, scope);
+                    realRequest = Properties.smartCopy(smartRequest, realRequest, scope);
                     httpInstance.request = realRequest;
                 }
             }
@@ -306,16 +306,20 @@ package org.everest.flex.utils
             if(rootURL)					httpInstance.rootURL = rootURL;
             if(proxyChanged)			httpInstance.useProxy = useProxy;
             if(objectsBindableChanged)	httpInstance.makeObjectsBindable = makeObjectsBindable;
-
             if(method)
             {
-                var realMethod:Object = ( method is ISmartObject ) ?  ISmartObject( method ).getValue( scope ) : method;
-                if( realMethod is String )
+                var realMethod:String = (method is ISmartObject) ? ISmartObject(method).getValue(scope).toString() : method.toString();                
+                // Since Flex only passes GET and POST requests, we have to
+                // replace DELETE, PATCH and PUT methods with POST and 
+                // set a corresponding X-HTTP-Method-Override header.
+                if (realMethod == RestActions.DELETE || realMethod == RestActions.PATCH 
+                    || realMethod == RestActions.PUT)
                 {
-                    httpInstance.method = realMethod as String;
+                    httpInstance.headers['X-HTTP-Method-Override'] = realMethod;
+                    realMethod = RestActions.POST;
                 }
+                httpInstance.method = realMethod;
             }
-
             if(username && password)
             {
                 if(username is ISmartObject)
@@ -357,11 +361,11 @@ package org.everest.flex.utils
         /**
          * @inheritDoc
          */
-        override protected function complete( scope:IScope ):void
+        override protected function complete(scope:IScope):void
         {
             // Error state when we don't have a token.  Maybe we called a method that returned
             // void instead?
-            if ( token == null )
+            if (token == null)
             {
                 return;
             }
@@ -372,80 +376,81 @@ package org.everest.flex.utils
 
             // Generate a responder associated with the token and dispatcher, and add it
             // to the list of responds for the token
-            token.addResponder( createResponder( token, dispatcher ) );
+            token.addResponder(createResponder(token, dispatcher));
 
             // The inner handlers dispatcher is the internal dispatcher the responder uses
             innerHandlersDispatcher = dispatcher;
 
-            if ( resultHandlers && resultHandlers.length > 0 )
+            if (resultHandlers && resultHandlers.length > 0)
             {
-                var resultHandlersInstance:ServiceHandlers = createInnerHandlers( scope,
+                var resultHandlersInstance:ServiceHandlers = createInnerHandlers(scope,
                     ResultEvent.RESULT,
                     resultHandlers,
-                    ServiceHandlers ) as ServiceHandlers;
+                    ServiceHandlers) as ServiceHandlers;
                 resultHandlersInstance.token = token;
                 resultHandlersInstance.validateNow();
             }
 
-            if ( (faultHandlers && faultHandlers.length > 0 )
-                || scope.dispatcher.hasEventListener( UnhandledFaultEvent.FAULT ) )
+            if ((faultHandlers && faultHandlers.length > 0)
+                || scope.dispatcher.hasEventListener(UnhandledFaultEvent.FAULT))
             {
-                var faultHandlersInstance:ServiceHandlers = createInnerHandlers( scope,
+                var faultHandlersInstance:ServiceHandlers = createInnerHandlers(scope,
                     FaultEvent.FAULT,
                     faultHandlers,
-                    ServiceHandlers ) as ServiceHandlers;
+                    ServiceHandlers) as ServiceHandlers;
                 faultHandlersInstance.token = token;
                 faultHandlersInstance.validateNow();
             }
         }
 
 
-        protected function createResponder( token:AsyncToken, dispatcher:EventDispatcher ):Responder
+        protected function createResponder(token:AsyncToken, dispatcher:EventDispatcher):Responder
         {
             return new Responder(
 
-                function( data:Object ):void
+                function(data:Object):void
                 {
 
                     // Convert the result into a result event and notify inner handlers
                     var resultEvent:ResultEvent;
-                    if ( data is ResultEvent )
+                    if (data is ResultEvent)
                     {
-                        var result:XML = XML(ResultEvent( data ).result);
+                        var result:XML = XML(ResultEvent(data).result);
                         //                        var rootElement:Object = result.children()[0];
 
                         if((result != null) && (result.name() == "error")){
-                            resultEvent = FaultEvent.createEvent( new RestFault( result.code, result.message, result.details, result.location ), token );
+                            resultEvent = FaultEvent.createEvent(
+                                new RestFault(result.code, result.message, result.details, result.location), token);
                         } else {
-                            resultEvent = ResultEvent.createEvent( result, token );
+                            resultEvent = ResultEvent.createEvent(result, token);
                         }
                     }
                     else
                     {
-                        resultEvent = ResultEvent.createEvent( data, token );
+                        resultEvent = ResultEvent.createEvent(data, token);
                     }
-                    dispatcher.dispatchEvent( resultEvent );
+                    dispatcher.dispatchEvent(resultEvent);
                 },
-                function( info:Object ):void
+                function(info:Object):void
                 {
 
 
                     // Convert the error into a fault event and notify inner handlers
                     var faultEvent:FaultEvent;
-                    if ( info is FaultEvent )
+                    if (info is FaultEvent)
                     {
-                        faultEvent = FaultEvent.createEvent( FaultEvent( info ).fault, token );
+                        faultEvent = FaultEvent.createEvent(FaultEvent(info).fault, token);
                     }
-                    else if ( info is Fault )
+                    else if (info is Fault)
                     {
-                        faultEvent = FaultEvent.createEvent( Fault( info ), token );
+                        faultEvent = FaultEvent.createEvent(Fault(info), token);
                     }
                     else
                     {
-                        faultEvent = FaultEvent.createEvent( new Fault( info.toString(), info.toString() ), token );
+                        faultEvent = FaultEvent.createEvent(new Fault(info.toString(), info.toString()), token);
                     }
-                    dispatcher.dispatchEvent( faultEvent );
-                } );
+                    dispatcher.dispatchEvent(faultEvent);
+                });
         }
     }
 }

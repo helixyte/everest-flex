@@ -2,6 +2,7 @@
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
     <classEntry path="org.everest.flex.utils.LabelUtils"/>
+    <classEntry path="org.everest.flex.utils.RestActions"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

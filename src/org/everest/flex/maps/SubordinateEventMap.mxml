@@ -11,13 +11,13 @@ Mate framework event handler definition for subordinate REST requests.
                cache="local" xmlns:utils="org.everest.flex.utils.*">
     <fx:Script>
         <![CDATA[
+            import mx.events.FlexEvent;
+            
             import org.everest.flex.events.CollectionEvent;
             import org.everest.flex.events.RestFaultEvent;
             import org.everest.flex.events.SubordinateEvent;
-
+            import org.everest.flex.utils.RestActions;
             import org.everest.flex.utils.TraceUtils;
-
-            import mx.events.FlexEvent;
 
 
 
@@ -46,7 +46,7 @@ Mate framework event handler definition for subordinate REST requests.
             <utils:RestServiceInvoker 
                         url="{event.url}" 
                         resultFormat="e4x"
-                        method="GET"
+                        method="{RestActions.GET}"
                         headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker

@@ -12,7 +12,6 @@ The additionalContent section goes below and it not intended to be editable.
           xmlns:s="library://ns.adobe.com/flex/spark"
           xmlns:mx="library://ns.adobe.com/flex/mx"
           xmlns:validators="org.everest.flex.ui.validators.*"
-          xmlns:BarCode="BarCode.*"
           currentState="{model.viewState}" initialize="init();"
           verticalAlign="top"
           enabled.pendingResponse="false">
@@ -52,7 +51,7 @@ The additionalContent section goes below and it not intended to be editable.
             DATE_TIME_FORMAT.dateTimePattern = "EEE, MMM dd yyyy HH:mm";
 
             private function init():void {
-                // Add the top component to the VBox container.
+                // View content.
                 if (content != null)
                 {
                     for each (var e:UIComponent in content)
@@ -60,6 +59,7 @@ The additionalContent section goes below and it not intended to be editable.
                         contentGroup.addElement(e);
                     }
                 }
+                // Editor content (replaces view content).
                 if (editorContent != null)
                 {
                     for each (var e1:UIComponent in editorContent)
@@ -68,22 +68,23 @@ The additionalContent section goes below and it not intended to be editable.
                     }
                     editable = true;
                 }
-                //this is additional content that goes below the editable member form
-                if (additionalContent != null)
-                {
-                    additionalContentGroup.percentHeight = 100;
-                    for each (var f:UIComponent in additionalContent)
-                    {
-                        additionalContentGroup.addElement(f);
-                    }
-                }
-                //this is additional content that goes below the editable member form
+                // The content of the action bar at the bottom of the editable 
+                // member form.
                 if (actionBarContent != null)
                 {
                     actionBarContentGroup.includeInLayout = true;
                     for each (var g:UIComponent in actionBarContent)
                     {
                         actionBarContentGroup.addElement(g);
+                    }
+                }
+                // Additional content that goes below the editable member form.
+                if (additionalContent != null)
+                {
+                    additionalContentGroup.percentHeight = 100;
+                    for each (var f:UIComponent in additionalContent)
+                    {
+                        additionalContentGroup.addElement(f);
                     }
                 }
 

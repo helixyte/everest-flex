@@ -22,6 +22,7 @@ application.
             import org.everest.flex.model.managers.EverestShellManager;
             import org.everest.flex.ui.presenters.ShellPresentationModel;
             import org.everest.flex.ui.views.EverestShellView;
+            import org.everest.flex.utils.RestActions;
 
             import mx.core.FlexGlobals;
             import mx.events.FlexEvent;
@@ -89,7 +90,7 @@ application.
             <utils:RestServiceInvoker 
                             url="{event.pageUrl}" 
                             resultFormat="e4x"
-                            method="GET" 
+                            method="{RestActions.GET}"
                             contentType="application/zip"
                             headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
@@ -115,7 +116,7 @@ application.
             <utils:RestServiceInvoker 
                         url="{event.pageUrl}" 
                         resultFormat="e4x"
-                        method="GET"
+                        method="{RestActions.GET}"
                         headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
@@ -148,7 +149,7 @@ application.
                             resultFormat="e4x"
                             contentType="{event.contentType}"
 							responseContentType="{event.responseContentType}"
-                            method="POST" 
+                            method="{RestActions.POST}" 
                             request="{event.binaryData}">
                 <utils:resultHandlers>
 					<InlineInvoker method="{CursorManager.removeBusyCursor}" />
@@ -188,7 +189,7 @@ application.
             <utils:RestServiceInvoker 
                             url="{event.pageUrl}" resultFormat="e4x"
                             contentType="application/xml"
-                            method="POST" 
+                            method="{RestActions.POST}" 
                             request="{lastReturn}"
                             headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
@@ -225,7 +226,7 @@ application.
                         url="{event.pageUrl}" 
                         resultFormat="e4x"
                         contentType="application/xml"
-                        method="POST"
+                        method="{RestActions.POST}"
                         request="{lastReturn}"
                         headers="{{'ACCEPT':'application/atom+xml'}}">
             </utils:RestServiceInvoker>
@@ -242,12 +243,12 @@ application.
                            method="serializeMember"
                            arguments="{event.member}" />
             <utils:RestServiceInvoker 
-                            url="{event.member.selfLink}" resultFormat="e4x"
+                            url="{event.member.selfLink}" 
+                            resultFormat="e4x"
                             contentType="application/xml"
-                            method="POST"
+                            method="{event.editAction}"
                             request="{lastReturn}"
-                            headers="{{'X-HTTP-Method-Override': 'PUT', 
-                                       'ACCEPT' : 'application/atom+xml'}}">
+                            headers="{{'ACCEPT' : 'application/atom+xml'}}">
                 <utils:resultHandlers>
                    <MethodInvoker
                         generator="{EverestShellManager}" method="loadDocument"
@@ -267,6 +268,7 @@ application.
         <EventHandlers type="{MemberEvent.EDIT_MEMBER_IN_BACKGROUND}"
                        start="trace('* Start of MemberEvent.EDIT_MEMBER_IN_BACKGROUND handling!')"
                        end="trace('* End of MemberEvent.EDIT_MEMBER_IN_BACKGROUND handling!')">
+            <InlineInvoker method="{CursorManager.setBusyCursor}" />
             <MethodInvoker generator="{EverestShellManager}"
                            method="serializeMember"
                            arguments="{event.member}" />
@@ -274,16 +276,25 @@ application.
                             url="{event.member.selfLink}" 
                             resultFormat="e4x"
                             contentType="application/xml"
-                            method="POST"
+                            method="{event.editAction}"
                             request="{lastReturn}"
-                            headers="{{'X-HTTP-Method-Override': 'PUT', 
-                                       'ACCEPT' : 'application/atom+xml'}}">
+                            headers="{{'ACCEPT' : 'application/atom+xml'}}">
+                <utils:resultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                </utils:resultHandlers>
+                <utils:faultHandlers>
+                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+                    <EventAnnouncer generator="{RestFaultEvent}"
+                                    type="{RestFaultEvent.ERROR}">
+                        <Properties fault="{fault}" cause="{event}"/>
+                    </EventAnnouncer>
+                </utils:faultHandlers>
             </utils:RestServiceInvoker>
         </EventHandlers>
 
-        <EventHandlers type="{MemberEvent.UPDATE_MEMBER_FROM_DATA}"
-                       start="trace('* Start of MemberEvent.UPDATE_MEMBER_FROM_DATA handling!')"
-                       end="trace('* End of MemberEvent.UPDATE_MEMBER_FROM_DATA handling!')">
+        <EventHandlers type="{MemberEvent.EDIT_MEMBER_FROM_DATA}"
+                       start="trace('* Start of MemberEvent.EDIT_MEMBER_FROM_DATA handling!')"
+                       end="trace('* End of MemberEvent.EDIT_MEMBER_FROM_DATA handling!')">
             <InlineInvoker method="{CursorManager.setBusyCursor}" />
             <MethodInvoker generator="{ShellPresentationModel}"
                            method="updateViewState"
@@ -293,9 +304,8 @@ application.
                             resultFormat="e4x"
                             contentType="{event.contentType}"
 							responseContentType="{event.responseContentType}"
-                            method="POST"
-                            request="{event.binaryData}"
-                            headers="{{'X-HTTP-Method-Override':'PUT'}}">
+                            method="{event.editAction}"
+                            request="{event.binaryData}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{EverestShellManager}" method="loadMember"

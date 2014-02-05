@@ -14,16 +14,17 @@ Mate framework event handler definition for all REST collection views.
     <fx:Script>
         <![CDATA[
             import com.asfusion.mate.actionLists.IScope;
-            import org.everest.flex.model.ResourceState;
-
+            
+            import mx.events.FlexEvent;
+            import mx.managers.CursorManager;
+            
             import org.everest.flex.events.CollectionEvent;
             import org.everest.flex.events.DocumentEvent;
             import org.everest.flex.events.MemberEvent;
             import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.model.ResourceState;
             import org.everest.flex.model.managers.CollectionManager;
-
-            import mx.events.FlexEvent;
-            import mx.managers.CursorManager;
+            import org.everest.flex.utils.RestActions;
             public var contentType:String;
 
             [Bindable]
@@ -118,9 +119,8 @@ Mate framework event handler definition for all REST collection views.
                             url="{event.member.selfLink}"
                             resultFormat="text" 
                             contentType="text/plain"
-                            method="POST" 
-                            request="{' '}"
-                            headers="{{'X-HTTP-Method-Override': 'DELETE'}}">
+                            method="{RestActions.DELETE}" 
+                            request="{' '}">
                 <utils:resultHandlers>
                     <MethodInvoker
                         generator="{manager}" method="removeMember"

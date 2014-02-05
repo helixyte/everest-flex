@@ -19,7 +19,7 @@ package org.everest.flex.ui.presenters
 
     /**
      * Contains the presentation logic and data for the REST member view.
-     * This class contains methods to access and manipultate the member data
+     * This class contains methods to access and manipulate the member data
      * model. It can be extended by an everest implementation to add additional
      * featrues for each member and its view.
      *
@@ -79,12 +79,12 @@ package org.everest.flex.ui.presenters
 
         public function set subMember(member:Member):void
         {
-           //needs to be overwritten if child wants to process sub members
+           // Override if the child wants to process a sub member.
         }
 
         public function set subMembers(member:MembersCollection):void
         {
-            //needs to be overwritten if child wants to process sub members
+            // Override if the child wants to process sub members.
         }
 
         [Bindable(Event="memberChanged")]
@@ -115,25 +115,34 @@ package org.everest.flex.ui.presenters
             dispatchEvent(new Event("selectedViewIndexChanged"));
         }
 
-        public function submit(member:Member=null):void
+        public function submit(member:Member=null, 
+                               processInBackground:Boolean=false,
+                               editMode:String=MemberEvent.EDIT_MODE_UPDATE):void
         {
-           trace("- Editing Member using XML\n");
-           updateViewState(ResourceState.PENDING_REQUEST);
-            var event:MemberEvent = new MemberEvent(MemberEvent.EDIT_MEMBER);
-
+            trace("- Editing Member using XML.\n");
+            updateViewState(ResourceState.PENDING_REQUEST);
+            var evtType:String;
+            if (processInBackground) {
+                evtType = MemberEvent.EDIT_MEMBER_IN_BACKGROUND
+            } else {
+                evtType = MemberEvent.EDIT_MEMBER
+            }
+            var event:MemberEvent = new MemberEvent(evtType);
             if (member != null)
             {
                 event.member = member;
             } else {
                 event.member = _member;
             }
-
+            event.editMode = editMode;
             dispatcher.dispatchEvent(event);
         }
 
         public function deleteMember():void
         {
-            ConfirmationView.show("Are you sure you want to delete this member?", "Delete member confirmation", deleteMemberCloseHandler);
+            ConfirmationView.show(
+                "Are you sure you want to delete this member?", 
+                "Delete member confirmation", deleteMemberCloseHandler);
         }
 
         private function deleteMemberCloseHandler(event:CloseEvent):void
@@ -151,16 +160,16 @@ package org.everest.flex.ui.presenters
             dispatcher.dispatchEvent(event);
         }
 
-        public function updateMemberFromData(data:ByteArray, contentType:String, responseContentType:String=null):void
+        public function editMemberFromData(
+            data:ByteArray, contentType:String, responseContentType:String=null):void
         {
-            trace("- Update Member using binary data of a given conten type.\n");
-
-            var event:MemberEvent = new MemberEvent(MemberEvent.UPDATE_MEMBER_FROM_DATA);
+            trace("- Update Member using binary data of content type ", contentType, ".\n");
+            var event:MemberEvent = new MemberEvent(MemberEvent.EDIT_MEMBER_FROM_DATA);
             event.binaryData = data;
 			event.contentType = contentType;
 			event.responseContentType = responseContentType;
             event.member = _member;
-
+            event.editMode = MemberEvent.EDIT_MODE_REPLACE;
 			dispatcher.dispatchEvent(event);
         }
 

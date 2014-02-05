@@ -1,5 +1,8 @@
 package org.everest.flex.model
 {
+    import flash.utils.getDefinitionByName;
+    import flash.utils.getQualifiedClassName;
+    
     import org.everest.flex.interfaces.INavigationLink;
 
     [Bindable]
@@ -12,9 +15,9 @@ package org.everest.flex.model
      */
     public class Member implements INavigationLink
     {
+        public var title:String;
         public var selfLink:String;
         public var href:String;
-        public var title:String;
         public var id:*;
         public var kind:String;
 
@@ -39,6 +42,17 @@ package org.everest.flex.model
 
         public function toString():String{
             return this.title;
+        }
+        
+        public function blank():* {
+            var ClassReference:Class = getDefinitionByName(getQualifiedClassName(this)) as Class;
+            var clone:Object = new ClassReference(null, null);
+            clone.title = this.title;
+            clone.selfLink = this.selfLink;
+            clone.href = this.href;
+            clone.id = this.id;
+            clone.kind = this.kind;
+            return clone;
         }
 
     }

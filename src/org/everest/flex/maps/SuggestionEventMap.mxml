@@ -14,14 +14,13 @@ triggered by auto 'suggest' components such as a combo box.
                >
     <fx:Script>
         <![CDATA[
+            import mx.events.FlexEvent;
+            
             import org.everest.flex.events.RestFaultEvent;
             import org.everest.flex.events.SuggestionEvent;
-            import org.everest.flex.model.managers.CollectionManager;
             import org.everest.flex.model.managers.SuggestionManager;
-
+            import org.everest.flex.utils.RestActions;
             import org.everest.flex.utils.TraceUtils;
-
-            import mx.events.FlexEvent;
 
 
             [Bindable]
@@ -52,7 +51,7 @@ triggered by auto 'suggest' components such as a combo box.
             <utils:RestServiceInvoker 
                         url="{event.url}"
                         resultFormat="e4x"
-                        method="GET"
+                        method="{RestActions.GET}"
                         headers="{{'ACCEPT':'application/atom+xml'}}">
                 <utils:resultHandlers>
                     <MethodInvoker
