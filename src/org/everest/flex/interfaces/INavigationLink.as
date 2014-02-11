@@ -44,5 +44,6 @@ package org.everest.flex.interfaces
          *
          */
         function set kind(kind:String):void;
+
     }
 }

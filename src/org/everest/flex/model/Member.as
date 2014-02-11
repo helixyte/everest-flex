@@ -30,7 +30,7 @@ package org.everest.flex.model
 
         public function get link():INavigationLink{
             if ((href != null)&&(href.length > 0)){
-                return new Link(title, href);
+                return new Link(title, href, Link.MEMBER, id);
             }
             return null;
         }
@@ -45,7 +45,8 @@ package org.everest.flex.model
         }
         
         public function blank():* {
-            var ClassReference:Class = getDefinitionByName(getQualifiedClassName(this)) as Class;
+            var ClassReference:Class = 
+                getDefinitionByName(getQualifiedClassName(this)) as Class;
             var clone:Object = new ClassReference(null, null);
             clone.title = this.title;
             clone.selfLink = this.selfLink;

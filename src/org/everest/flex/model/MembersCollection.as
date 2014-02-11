@@ -34,7 +34,7 @@ package org.everest.flex.model
 
         public function get link():INavigationLink{
             if ((href != null)&&(href.length > 0)){
-                return new Link(title, href,Link.COLLECTION);
+                return new Link(title, href, Link.COLLECTION);
             }
             return null;
         }

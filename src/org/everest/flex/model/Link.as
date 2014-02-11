@@ -19,12 +19,14 @@ package org.everest.flex.model
         private var _href:String;
         private var _title:String;
         private var _kind:String;
+        private var _id:*;
 
-        public function Link(title:String=null, url:String=null, kind:String=MEMBER)
+        public function Link(title:String=null, url:String=null, kind:String=MEMBER, id:*=null)
         {
             this.href = url;
             this.title = title;
             this.kind = kind;
+            this.id = id;
         }
 
         public function get title():String{
@@ -58,5 +60,15 @@ package org.everest.flex.model
             _kind = value;
         }
 
+        public function get id():*
+        {
+            return _id;
+        }
+        
+        public function set id(value:*):void
+        {
+            _id = value;
+        }
+        
     }
 }
