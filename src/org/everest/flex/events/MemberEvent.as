@@ -42,7 +42,7 @@ package org.everest.flex.events
             if (type == EDIT_MEMBER)
             {
                 // Set default edit mode.
-                _editMode = EDIT_MODE_UPDATE;
+                _editMode = EDIT_MODE_REPLACE;
             }
         }
 		

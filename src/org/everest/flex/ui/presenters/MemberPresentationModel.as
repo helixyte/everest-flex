@@ -117,7 +117,7 @@ package org.everest.flex.ui.presenters
 
         public function submit(member:Member=null, 
                                processInBackground:Boolean=false,
-                               editMode:String=MemberEvent.EDIT_MODE_UPDATE):void
+                               editMode:String=MemberEvent.EDIT_MODE_REPLACE):void
         {
             trace("- Editing Member using XML.\n");
             updateViewState(ResourceState.PENDING_REQUEST);

@@ -3,13 +3,11 @@ package org.everest.flex.ui.presenters
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.IEventDispatcher;
-
+    
     import org.everest.flex.events.CollectionEvent;
     import org.everest.flex.events.DocumentEvent;
     import org.everest.flex.events.MemberEvent;
-    import org.everest.flex.events.NavigationEvent;
     import org.everest.flex.events.RestFaultEvent;
-    import org.everest.flex.model.ContentType;
     import org.everest.flex.model.DocumentDescriptor;
     import org.everest.flex.model.ResourceState;
     import org.everest.flex.ui.components.ErrorView;
@@ -78,6 +76,7 @@ package org.everest.flex.ui.presenters
                             var e:MemberEvent = new MemberEvent(cause.type);
                             e.binaryData = MemberEvent(cause).binaryData;
                             e.contentType = MemberEvent(cause).contentType;
+							e.editMode = MemberEvent(cause).editMode;
                             e.responseContentType = MemberEvent(cause).responseContentType;
                             e.pageUrl = MemberEvent(cause).pageUrl;
                             e.member = MemberEvent(cause).member;
