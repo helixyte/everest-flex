@@ -348,19 +348,17 @@ package org.everest.flex.model.managers
 
         public function loadNewMember(pageUrl:String, doc:XML):void
         {
-            //this is all a bit messy as the result object has no
-            //id attributes because the database commit will happen
-            //after the result is sent.
             use namespace atom;
             var url:String = doc.link.(@rel=="self")[0].@href;
-            if (StringUtils.contains(url, "/None/"))
+			// In some cases, the id attribute is populated (e.g. through
+			// a database commit) *after* the result has been sent which 
+			// results in two trailing slashes in the generated URL. All
+			// we can do then is try to reload the current view.
+            if (StringUtils.endsWith(url, "//"))
             {
-                //no way to determine the url of the newly created member
-                //so reload the current view
                 url = fragment;
             }
-
-            //go ahead and refetch the member
+            // Go ahead and refetch the member.
             trace("- Goto Member: " + url);
             var event:NavigationEvent =
                 new NavigationEvent(NavigationEvent.LOAD_PAGE);
