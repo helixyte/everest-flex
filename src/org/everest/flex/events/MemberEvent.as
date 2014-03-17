@@ -39,7 +39,7 @@ package org.everest.flex.events
                                     cancelable:Boolean=false)
         {
             super(type, bubbles, cancelable);
-            if (type == EDIT_MEMBER)
+            if (type == EDIT_MEMBER || type == EDIT_MEMBER_FROM_DATA || type == EDIT_MEMBER_IN_BACKGROUND)
             {
                 // Set default edit mode.
                 _editMode = EDIT_MODE_REPLACE;
