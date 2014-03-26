@@ -72,7 +72,7 @@ method 'show' can be used to invoke this view.
 
             protected function buttonTrac_clickHandler(event:MouseEvent):void
             {
-                navigateToURL( new URLRequest("http://trac/cenix/newticket?component=LOUICe&description=" + message + "&summary=LOUICe Error "));
+                navigateToURL( new URLRequest("http://trac/cenix/newticket?component=LOUICe&summary=LOUICe Error&description=" + message));
             }
 
             protected function buttonChat_clickHandler(event:MouseEvent):void
