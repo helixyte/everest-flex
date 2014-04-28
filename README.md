@@ -1,7 +1,7 @@
 everest-flex
 ============
 
-Everest-fles is a framework to create Flex based clients for an everest REST back end.<br/>
+everest-flex is a framework to create Flex based clients for an everest REST back end.<br/>
 The ActionScript documentation can be found here:<br/>
 http://cenix.github.com/everest-flex/asdoc<br/>
 The latest SWC can be downloaded here:<br/>
