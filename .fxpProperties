@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="bae19d13-5903-4632-b185-3e27051041ef" projectUUID="bae19d13-5903-4632-b185-3e27051041ef" pureCatalystProject="false" sdkVersion="4.6.0" uuid="77a02089-8806-470b-bce3-cb4f345dcc0a" version="15">
+  <projects/>
+  <src/>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="77a02089-8806-470b-bce3-cb4f345dcc0a"/>
+    <linked location="/libs" path="/libs" position="1" uuid="77a02089-8806-470b-bce3-cb4f345dcc0a"/>
+    <linked location="${PROJECT_FRAMEWORKS}/libs/mobile/mobilecomponents.swc" path="${PROJECT_FRAMEWORKS}/libs/mobile/mobilecomponents.swc" position="2" uuid="77a02089-8806-470b-bce3-cb4f345dcc0a"/>
+    <linked location="${PROJECT_FRAMEWORKS}/themes/Mobile/mobile.swc" path="${PROJECT_FRAMEWORKS}/themes/Mobile/mobile.swc" position="3" uuid="77a02089-8806-470b-bce3-cb4f345dcc0a"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="80" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

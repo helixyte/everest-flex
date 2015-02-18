@@ -280,7 +280,11 @@ application.
                             request="{lastReturn}"
                             headers="{{'ACCEPT' : 'application/atom+xml'}}">
                 <utils:resultHandlers>
-                    <InlineInvoker method="{CursorManager.removeBusyCursor}" />
+					<InlineInvoker method="{CursorManager.removeBusyCursor}" />
+					<EventAnnouncer generator="{MemberEvent}"
+									type="{MemberEvent.MEMBER_CHANGED}">
+						<Properties member="{event.member}"/>
+					</EventAnnouncer>
                 </utils:resultHandlers>
                 <utils:faultHandlers>
                     <InlineInvoker method="{CursorManager.removeBusyCursor}" />
@@ -321,7 +325,35 @@ application.
                 </utils:faultHandlers>
             </utils:RestServiceInvoker>
         </EventHandlers>
-
+		
+		<EventHandlers type="{MemberEvent.DELETE_MEMBER_IN_BACKGROUND}"
+					   start="trace('* Start of MemberEvent.DELETE_MEMBER_IN_BACKGROUND handling!')"
+					   end="trace('* End of MemberEvent.DELETE_MEMBER_IN_BACKGROUND handling!')">
+			<InlineInvoker method="{CursorManager.setBusyCursor}" />
+			<utils:RestServiceInvoker 
+				url="{event.member.selfLink}"
+				resultFormat="text"
+				contentType="text/plain"
+				method="{RestActions.DELETE}"
+				request=" "
+				headers="{{'ACCEPT' : 'application/atom+xml'}}">
+				<utils:resultHandlers>
+					<EventAnnouncer generator="{MemberEvent}"
+									type="{MemberEvent.MEMBER_DELETED}">
+						<Properties member="{event.member}"/>
+					</EventAnnouncer>
+					<InlineInvoker method="{CursorManager.removeBusyCursor}" />
+				</utils:resultHandlers>
+				<utils:faultHandlers>
+					<InlineInvoker method="{CursorManager.removeBusyCursor}" />
+					<EventAnnouncer generator="{RestFaultEvent}"
+									type="{RestFaultEvent.ERROR}">
+						<Properties fault="{fault}" cause="{event}"/>
+					</EventAnnouncer>
+				</utils:faultHandlers>
+			</utils:RestServiceInvoker>
+		</EventHandlers>
+		
         <EventHandlers type="{RestFaultEvent.ERROR}"
                        start="trace('* Start of MessageEvent.ERROR handling!')"
                        end="trace('* End of MessageEvent.ERROR handling!')">

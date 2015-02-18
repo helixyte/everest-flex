@@ -77,8 +77,7 @@ package org.everest.flex.ui.presenters
          * E.g. sort by company requries company.name as criteria
          */
         public var sortFieldNames:Dictionary = new Dictionary();
-
-
+		
         protected var dispatcher:IEventDispatcher;
 
 
@@ -109,7 +108,7 @@ package org.everest.flex.ui.presenters
         private var _lastPageLink:String;
 
         private var _sortFields:Array = new Array();
-
+		
         // Pattern adopted from http://djangosnippets.org/snippets/585/
         // We need a separate utility class for our custom string conversions
         private var camelCaseSplitPattern:RegExp = /(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))/g;
@@ -659,8 +658,6 @@ package org.everest.flex.ui.presenters
             {
                 params.push("size=" + selectedPageSize.data);
             }
-
-
             return params;
         }
 

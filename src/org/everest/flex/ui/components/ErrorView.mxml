@@ -29,7 +29,7 @@ method 'show' can be used to invoke this view.
              *
              * @param errorMessage the error message to be shown
              */
-            public static function show(errorMessage:String):void{
+            public static function show(errorMessage:String):ErrorView{
                 var parent:DisplayObject = Sprite(FlexGlobals.topLevelApplication);
                 var  p:IFlexDisplayObject = PopUpManager.createPopUp(parent, ErrorView, true);
                 errorMessage.replace("<br>","\n");
@@ -37,6 +37,7 @@ method 'show' can be used to invoke this view.
                 PopUpManager.centerPopUp(p);
                 parent.addEventListener(Event.REMOVED_FROM_STAGE, function(evnent:Event):void{PopUpManager.removePopUp(p)});
                 CursorManager.removeBusyCursor();
+				return ErrorView(p);
             }
 
             [Bindable]

@@ -13,8 +13,9 @@ package org.everest.flex.events
      */
     public class MemberEvent extends Event
     {
-        public static const MEMBER_CHANGED:String = "memberChanged";
+		// Action events.
         public static const DELETE_MEMBER:String = "deleteMemberEvent";
+		public static const DELETE_MEMBER_IN_BACKGROUND:String = "deleteMemberBackgroundEvent";
         public static const CREATE_MEMBER:String = "createMemberEvent";
         public static const CREATE_MEMBER_IN_BACKGROUND:String = "createMemberBackgroundEvent";
         public static const CREATE_MEMBER_FROM_DATA:String = "createMemberFromDataEvent";
@@ -22,7 +23,14 @@ package org.everest.flex.events
         public static const EDIT_MEMBER_IN_BACKGROUND:String = "editMemberBackgroundEvent";
         public static const EDIT_MEMBER_FROM_DATA:String = "editMemberFromDataEvent";
         
-        public static const EDIT_MODE_UPDATE:String = "update";
+		// Response events.
+		public static const MEMBER_CHANGED:String = "memberChanged";
+		public static const MEMBER_CREATED:String = "memberCreated";
+		public static const MEMBER_EDITED:String = "memberEdited";
+		public static const MEMBER_DELETED:String = "memberDeleted";
+
+		// Edit modes.
+		public static const EDIT_MODE_UPDATE:String = "update";
         public static const EDIT_MODE_REPLACE:String = "replace";
         public static const EDIT_MODES:Vector.<String> = 
             Vector.<String>([EDIT_MODE_UPDATE, EDIT_MODE_REPLACE]);
@@ -68,7 +76,7 @@ package org.everest.flex.events
             }
             _editMode = mode;
         }
-        
+		
         public function get editMode():String
         {
             return _editMode;

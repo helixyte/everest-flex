@@ -17,15 +17,16 @@ CollectionPresentationModel as model.
                                      sortableColumns="true">
     <fx:Script>
         <![CDATA[
-            import mx.binding.utils.BindingUtils;
-            import mx.collections.ArrayCollection;
-
-            import org.everest.flex.events.NavigationLinkEvent;
-            import org.everest.flex.events.SubordinateEvent;
-            import org.everest.flex.ui.presenters.CollectionPresentationModel;
-
-            import spark.collections.SortField;
-            import spark.components.gridClasses.GridColumn;
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
+			
+			import spark.collections.SortField;
+			import spark.components.gridClasses.GridColumn;
+			
+			import org.everest.flex.events.NavigationLinkEvent;
+			import org.everest.flex.events.SubordinateEvent;
+			import org.everest.flex.ui.presenters.CollectionPresentationModel;
 
             [Bindable]
             private var _feedUrl:String;
@@ -59,9 +60,7 @@ CollectionPresentationModel as model.
 
             public function set model(value:CollectionPresentationModel):void
             {
-                selectedItems
                 _model = value;
-
                 if (_model != null)
                 {
                     BindingUtils.bindProperty(
@@ -70,8 +69,7 @@ CollectionPresentationModel as model.
                     BindingUtils.bindProperty(
                         _model, "selectedMembers", this, "selectedItems"
                     );
-                }
-
+				}
                 if(_filterFunction != null){
                    ArrayCollection(dataProvider).filterFunction = _filterFunction;
                    ArrayCollection(dataProvider).refresh();
@@ -79,15 +77,13 @@ CollectionPresentationModel as model.
             }
 
             public function set filterFunction(func:Function):void{
-
                 this._filterFunction = func;
-
                 if(dataProvider != null){
                     ArrayCollection(dataProvider).filterFunction  = func;
                     ArrayCollection(dataProvider).refresh();
                 }
             }
-
+			
             public override function sortByMultiColumns(columnIndices:Vector.<int>, isInteractive:Boolean = false , multiColSort:Boolean = false):Boolean
             {
                 if (_model.selectedPageSize != null && _model.totalResults < _model.selectedPageSize.data) {
